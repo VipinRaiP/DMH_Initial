@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Router} from "@angular/router"
+
 
 @Component({
   selector: 'app-root',
@@ -7,4 +9,15 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'AngularInit';
+
+  constructor(private router:Router){
+
+  }
+
+  onClick(parameterType){
+    console.log(parameterType); 
+    //this.router.navigate(['/barChartAllDist']);
+  }
+
+
 }
