@@ -1,13 +1,35 @@
 <nav class="navbar navbar-light bg-light">
-    <a class="navbar-brand" href="#">Home</a>
-  </nav>
-  
-  <ol>
-    <li>
-        <ul class="list-group list-group-flush">
-            <h4>Comparision across all districts</h4>
-            <li class="list-group-item"><a routerLink="/barChartAllDist" (click)="onClick('AlcoholCases')"> Alcohol cases all districts</a></li>
-            <li class="list-group-item"><a routerLink="/barChartAllDist" (click)="onClick('SuicideCases')"> Suicide cases all districts</a></li>
-        </ul>
-      </li>
-  </ol>
+  <a class="navbar-brand" href="#">Home</a>
+</nav>
+
+<ol>
+  <li>
+    <ul class="list-group list-group-flush">
+      <h4>Comparision across all districts</h4>
+      <li class="list-group-item"><a routerLink="/barChartAllDist" (click)="onClick('AlcoholCases')"> Alcohol cases all
+          districts</a></li>
+      <li class="list-group-item"><a routerLink="/barChartAllDist" (click)="onClick('SuicideCases')"> Suicide cases all
+          districts</a></li>
+    </ul>
+  </li>
+  <li>
+    <form #f="ngForm" (ngSubmit)="onSubmitPerDist(f)">
+      <div class="form-group">
+        <label for="District Id">District Id</label>
+        <select ngModel class="form-control" name="districtId">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="Select Parameter">Parameter</label>
+        <select ngModel class="form-control" name="parameter">
+          <option value="alcoholCases">Alcohol Cases</option>
+          <option value="suicideCases">Suicide Cases</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+  </li>
+</ol>

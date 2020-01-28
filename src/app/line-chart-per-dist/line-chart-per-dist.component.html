@@ -1,0 +1,38 @@
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="#">{{chartParameters.yLabel}}</a>
+    </div>
+  
+    <ul>
+      <li id="home"><a routerLink="/">HOME</a></li>
+    </ul>
+  </nav>
+  
+  <!-- Bootstrap grid setup -->
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field>
+          <input matInput [matDatepicker]="picker1" placeholder="From Date" (dateInput)="addFromDate(input,$event)">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field>
+          <input matInput [matDatepicker]="picker2" placeholder="To Date" (dateInput)="addToDate(input,$event)">
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <button class="btn btn-primary" (click)="onClickGetChart()">Check</button>
+      </div>
+    </div>
+    <div class="row">
+      <div #chart id="chart-area"></div>
+    </div>
+  </div>
+  

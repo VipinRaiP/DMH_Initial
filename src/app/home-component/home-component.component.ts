@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {Router } from '@angular/router';
 import {BarChartAllDistParameters} from "../model/barchartAllDistParameters.model";
 import { BarChartAllDistService } from '../services/barchartAllDist.service';
-
+import {FormBuilder, NgForm} from '@angular/forms';
+import { LineChartPerDistService } from '../services/lineChartPerDist.service';
+import { LineChartPerDistParameters } from '../model/linechartPerDistParameters.model';
 
 @Component({
   selector: 'app-home-component',
@@ -14,7 +16,8 @@ export class HomeComponentComponent implements OnInit {
   ngOnInit() {
   }
 
-  constructor(private router:Router,private barchartService:BarChartAllDistService){
+  constructor(private router:Router,private barchartService:BarChartAllDistService,
+              private linechartPerDistService:LineChartPerDistService){
 
   }
 
@@ -41,8 +44,40 @@ export class HomeComponentComponent implements OnInit {
       }
       this.barchartService.updateParameters(parameters);
     }
-    //this.router.navigate(['/barChartAllDist']);
-    
+    //this.router.navigate(['/barChartAllDist']); 
   }
+
+  onSubmitPerDist(form:NgForm){
+    let linechartParameters: LineChartPerDistParameters;
+    console.log(+form.value.districtId);
+    linechartParameters = this.resolvePerDistParameter(+form.value.districtId,form.value.parameter);   
+    this.linechartPerDistService.updateParameters(linechartParameters);
+    this.router.navigate(["lineChartPerDist"]);
+  }
+
+  /* Resolve parameters */
+
+resolvePerDistParameter(districtId,parameter){
+  if(parameter=="alcoholCases"){
+    return {
+      yLabel : "Alcohol Cases",
+      data : "getAlcoholDataPerDist",
+      threshold : 30,
+      columnName : "AlcoholCases",
+      districtId: districtId
+    }
+  }
+  if(parameter=="suicideCases"){
+    return {
+      yLabel : "Suicide Cases",
+      data : "getSuicideDataPerDist",
+      threshold : 6,
+      columnName : "SuicideCases",
+      districtId: districtId
+    }
+  }
+}
+
+
 
 }

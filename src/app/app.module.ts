@@ -10,7 +10,10 @@ import { AppComponent } from './app.component';
 import { BarChartAllDistComponent } from './bar-chart-all-dist/bar-chart-all-dist.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HomeComponentComponent } from './home-component/home-component.component';
-import { BarChartAllDistService } from './services/barchartAllDist.service'
+import { BarChartAllDistService } from './services/barchartAllDist.service';
+import { LineChartPerDistComponent } from './line-chart-per-dist/line-chart-per-dist.component'
+import { FormsModule } from '@angular/forms';
+import { LineChartPerDistService } from './services/lineChartPerDist.service';
 
 
 @NgModule({
@@ -18,6 +21,7 @@ import { BarChartAllDistService } from './services/barchartAllDist.service'
     AppComponent,
     BarChartAllDistComponent,
     HomeComponentComponent,
+    LineChartPerDistComponent,
   ],
   imports: [
     BrowserModule,
@@ -29,9 +33,11 @@ import { BarChartAllDistService } from './services/barchartAllDist.service'
     MatDatepickerModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    MatInputModule
+    MatInputModule,
+    FormsModule  
   ],
   providers: [BarChartAllDistService,
+              LineChartPerDistService,
               Title],
   bootstrap: [AppComponent]
 })

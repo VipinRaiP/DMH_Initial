@@ -164,20 +164,20 @@ app.post("/getSuicideDataAllDist",function(req,res){
 
 app.post("/getAlcoholDataPerDist",function(req,res){
   districtId = req.body.districtId;
-
-  sql = "select ReportingDate,(sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases from mytable where DistrictId=? group by ReportingDate"
-
+  console.log(req.body )
+  sql = "select ReportingMonthyear,(sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases from mytable where DistrictId=? group by ReportingMonthyear"
+  console.log(sql)
   con.query(sql,[districtId],function(err, response) {
     if (err) console.log(err);
     console.log(response);
-    res.json({a:1,b:2});
+    res.json(response);
   });
 })
 
 app.post("/getSuicideDataPerDist",function(req,res){
   districtId = req.body.districtId;
 
-  sql = "select ReportingDate,(sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_male_suicidecases)+sum(new_male_suicidecases)) as SuicideCases from mytable where DistrictId=? group by ReportingDate"
+  sql = "select ReportingMonthyear,(sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_male_suicidecases)+sum(new_male_suicidecases)) as SuicideCases from mytable where DistrictId=? group by ReportingMonthyear"
 
   con.query(sql,[districtId],function(err, response) {
     if (err) console.log(err);
