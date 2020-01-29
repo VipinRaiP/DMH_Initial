@@ -155,11 +155,11 @@ export class BarChartAllDistComponent implements OnInit {
 
     // X Label
     this.xLabel = this.chart.append("text")
-      .attr("y", this.height - 30)
+      .attr("y", this.height - 20)
       .attr("x", this.width / 2 - 30)
       .attr("font-size", "20px")
       .attr("text-anchor", "middle")
-      .text("District Id");
+      .text("District");
 
     // Y Label
     this.yLabel = this.chart.append("text")
@@ -170,7 +170,7 @@ export class BarChartAllDistComponent implements OnInit {
       .attr("transform", "rotate(-90)")
 
     var legendGroup = svg.append("g")
-      .attr("transform", "translate(" + (this.width - 400) + "," + (this.height - 130) + ")");
+      .attr("transform", "translate(" + (this.width - 400) + "," + (this.height - 110) + ")");
 
     legendGroup
       .append("circle")
@@ -221,18 +221,19 @@ export class BarChartAllDistComponent implements OnInit {
   }
 
   updateChart() {
-    let xValue = 'DistrictId';
+    let xValue = 'District';
     let yValue = this.chartParameters.columnName;
 
     //.......................
 
     // define X & Y domains
-    let xDomain = this.data.map(d => d['DistrictId']);
+    let xDomain = this.data.map(d => d[xValue]);
     let yDomain = [0, d3.max(this.data, d => d[yValue])];
 
     console.log(yDomain)
     // create scales
-    this.xScale = d3.scaleBand().domain(xDomain).rangeRound([0, this.width - this.axisShortOffset]).padding(0.2);
+    this.xScale = d3.scaleBand().domain(xDomain).rangeRound([0, this.width - this.axisShortOffset]).padding(0.3);
+
     this.yScale = d3.scaleLinear().domain(yDomain).range([this.height - this.axisShortOffset, 0]);
     console.log(this.height)
     console.log(this.yScale(100));
@@ -243,7 +244,12 @@ export class BarChartAllDistComponent implements OnInit {
     this.xScale.domain(this.data.map(d => d[xValue]));
     this.yScale.domain([0, d3.max(this.data, d => d[yValue])]);
     //  this.colors.domain([0, this.data.length]);
-    this.xAxis.transition().call(d3.axisBottom(this.xScale));
+    this.xAxis.transition().call(d3.axisBottom(this.xScale))
+    .selectAll("text")
+    .attr("y", "3")
+    .attr("x", "-5")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-40)");;
     this.yAxis.transition().call(d3.axisLeft(this.yScale));
 
     // add labels

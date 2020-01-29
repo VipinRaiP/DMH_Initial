@@ -136,7 +136,7 @@ app.post("/getAlcoholDataAllDist",function(req,res){
   fromDate = req.body.fromDate;
   toDate = req.body.toDate;
   console.log(fromDate);  
-  sql = "select DistrictId,(sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases from mytable where ReportingDate >='" + fromDate + "' and ReportingDate <='" + toDate + "' group by DistrictId Order By AlcoholCases" 
+  sql = "select m.DistrictId,d.District,(sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases from mytable m,Districts d where m.DistrictId=d.DistrictId and ReportingDate >='" + fromDate + "' and ReportingDate <='" + toDate + "' group by m.DistrictId Order By AlcoholCases" 
      
   console.log(sql)
 
@@ -152,7 +152,7 @@ app.post("/getSuicideDataAllDist",function(req,res){
   fromDate = req.body.fromDate;
   toDate = req.body.toDate;
   console.log("no");
-  sql = "select DistrictId,(sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)+sum(new_male_suicidecases)) as SuicideCases from mytable where ReportingDate >='" + fromDate + "' and ReportingDate <='" + toDate + "' group by DistrictId Order By SuicideCases" 
+  sql = "select m.DistrictId,d.District,(sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)+sum(new_male_suicidecases)) as SuicideCases from mytable m,Districts d where m.DistrictId=d.DistrictId and ReportingDate >='" + fromDate + "' and ReportingDate <='" + toDate + "' group by d.DistrictId Order By SuicideCases" 
      
   console.log(sql)
 
