@@ -6,7 +6,34 @@ import { BarChartAllDistParameters } from '../model/barchartAllDistParameters.mo
 import { Title } from "@angular/platform-browser";
 import * as $ from 'jquery';
 import { Options } from 'ng5-slider';
-import { MatDatepickerInputEvent } from '@angular/material';
+import { MatDatepickerInputEvent, MatDatepicker } from '@angular/material';
+import * as _moment from 'moment';
+import { FormControl } from '@angular/forms';
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { default as _rollupMoment, Moment } from 'moment';
+import { ChildActivationStart } from '@angular/router';
+
+
+//import moment = require('moment');
+
+const moment = _rollupMoment || _moment; _moment;
+
+
+/* For Date picker year */
+
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'YYYY',
+  },
+  display: {
+    dateInput: 'YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
 
 @Component({
   selector: 'app-bar-chart-all-dist',
@@ -14,7 +41,19 @@ import { MatDatepickerInputEvent } from '@angular/material';
   styleUrls: ['./bar-chart-all-dist.component.css',
     '../../../node_modules/jquery-ui-dist/jquery-ui.min.css',
     '../../../node_modules/jquery-ui-dist/jquery-ui.structure.min.css',
-    '../../../node_modules/jquery-ui-dist/jquery-ui.theme.min.css']
+    '../../../node_modules/jquery-ui-dist/jquery-ui.theme.min.css'],
+  providers: [
+    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
+    // application's root module. We provide it at the component level here, due to limitations of
+    // our example generation script.
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+    },
+
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ]
 })
 
 export class BarChartAllDistComponent implements OnInit {
@@ -36,8 +75,20 @@ export class BarChartAllDistComponent implements OnInit {
   private xLabel: any;
   private parseTime = d3.timeParse("%d/%m/%Y");
   private formatTime = d3.timeFormat("%Y-%m-%d");
-  private fromDate:string;
-  private toDate:string;
+  private fromDate: string;
+  private toDate: string;
+
+  private year: number;
+  private quarterData: any;
+  private monthlyData: any;
+  private annualData: any;
+  private quarterChoosen: number = 1;
+  private monthChoosen: number = 1;
+  private months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  private monthName = "Jan";
+  private displayMonthData = false;
+  private displayQuarterData = false;
+  private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
 
   constructor(private elementRef: ElementRef, private http: HttpClient, private barChartService: BarChartAllDistService, private titleService: Title) { }
 
@@ -221,7 +272,9 @@ export class BarChartAllDistComponent implements OnInit {
   }
 
   updateChart() {
-    let xValue = 'District';
+    console.log("Data to chart")
+    console.log(this.data);
+    let xValue = 'DistrictId';
     let yValue = this.chartParameters.columnName;
 
     //.......................
@@ -245,11 +298,11 @@ export class BarChartAllDistComponent implements OnInit {
     this.yScale.domain([0, d3.max(this.data, d => d[yValue])]);
     //  this.colors.domain([0, this.data.length]);
     this.xAxis.transition().call(d3.axisBottom(this.xScale))
-    .selectAll("text")
-    .attr("y", "3")
-    .attr("x", "-5")
-    .attr("text-anchor", "end")
-    .attr("transform", "rotate(-40)");;
+      .selectAll("text")
+      .attr("y", "3")
+      .attr("x", "-5")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-40)");;
     this.yAxis.transition().call(d3.axisLeft(this.yScale));
 
     // add labels
@@ -303,5 +356,133 @@ export class BarChartAllDistComponent implements OnInit {
         this.updateChart();
       })
   }
+
+  /* *********************************************************************************************************************
+   * Setting the inputs from user 
+   *
+   * ********************************************************************************************************************/
+
+  onMonthChange(event: any) {
+    this.monthChoosen = event.value;
+    this.monthName = this.months[this.monthChoosen - 1];
+    console.log("Month changed");
+    console.log(event.value);
+    this.updateData();
+  }
+
+  onQuarterChange(event: any) {
+    console.log("Quarter changed " + event.value);
+    this.quarterChoosen = event.value;
+    this.updateData();
+  }
+
+  onGranularChange(event: any) {
+    console.log("Granular changed" + event.value)
+    this.granularChoosen = +event.value;
+    switch(this.granularChoosen){
+      case 2:
+          console.log("choosed")
+          this.displayMonthData = true;
+          this.displayQuarterData = false;
+          break;
+      case 3:
+        this.displayMonthData = false;
+        this.displayQuarterData = true;
+        break;
+      case 1:
+        this.displayMonthData = false;
+        this.displayQuarterData = false;  
+    }
+    this.updateData();
+  }
+
+  /* *********************************************************************************************************************
+   * Get the monthly quarterly and annual data for a year selected  
+   *
+   *  
+   * *********************************************************************************************************************/
+
+  getYearData(year: number) {
+    console.log(year)
+    let postData = {
+      year: year
+    }
+    this.http.post<any>("http://localhost:3000/" + "getAlcoholDataAllDistAnnually", postData)
+      .subscribe(responseData => {
+        console.log("Data received");
+        console.log(responseData);
+        this.annualData = responseData;
+      })
+
+    this.http.post<any>("http://localhost:3000/" + "getAlcoholDataAllDistQuart", postData)
+      .subscribe(responseData => {
+        console.log("Data received");
+        console.log(responseData);
+        this.quarterData = responseData;
+      })
+
+    this.http.post<any>("http://localhost:3000/" + "getAlcoholDataAllDistMonthly", postData)
+      .subscribe(responseData => {
+        console.log("Data received");
+        console.log(responseData);
+        this.monthlyData = responseData;
+      })
+  }
+
+  private yearObj = new FormControl(moment());
+
+  choosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
+    console.log("year called : " + normalizedYear.year())
+    const ctrlValue = this.yearObj.value;
+    ctrlValue.year(normalizedYear.year());
+    this.yearObj.setValue(ctrlValue);
+    datepicker.close();
+    this.year = normalizedYear.year();
+    this.getYearData(this.year);
+  }
+
+  getMonthData() {
+    console.log(this.monthlyData)
+    //this.monthChoosen = 6;
+    return this.monthlyData[this.monthChoosen];
+  }
+
+  getQuarterData() {
+    return this.quarterData[this.quarterChoosen];
+  }
+
+  /* *********************************************************************************************************************
+  *  Update the data as per granualarity
+  *
+  *  
+  * *********************************************************************************************************************/
+
+  updateData() {
+
+    if (this.granularChoosen == 1) {
+      /* Annual */
+      this.data = this.annualData;
+      console.log("Annual data");
+      console.log(this.data);
+      this.updateChart();
+    }
+    else if (this.granularChoosen == 2) {
+      /* Monthly */
+      console.log("Montly data for " + this.monthChoosen);
+      console.log(this.monthlyData);
+      this.data = this.getMonthData();
+      console.log(this.data);
+      this.updateChart();
+    }
+    else if (this.granularChoosen == 3) {
+      /* Quarterly */
+      console.log("Quarter data for " + this.quarterChoosen);
+      console.log(this.quarterData);
+      this.data = this.getQuarterData();
+      console.log(this.data)
+      this.updateChart();  
+    }
+  }
+
 
 }

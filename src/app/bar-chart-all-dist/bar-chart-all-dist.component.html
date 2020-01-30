@@ -11,23 +11,36 @@
 <!-- Bootstrap grid setup -->
 
 <div class="container">
-  <div class="row">
-    <div class="col-md-6">
-      <mat-form-field>
-        <input matInput [matDatepicker]="picker1" placeholder="From Date" (dateInput)="addFromDate(input,$event)">
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-      </mat-form-field>
-    </div>
-    <div class="col-md-6">
-      <mat-form-field>
-        <input matInput [matDatepicker]="picker2" placeholder="To Date" (dateInput)="addToDate(input,$event)">
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-      </mat-form-field>
-    </div>
-    <div class="col-md-6">
-      <button class="btn btn-primary" (click)="onClickGetChart()">Check</button>
+  <div class="container">
+    <div class="row">
+      <div *ngIf="displayMonthData" class="col-md-4">
+        <label for="MonthSelected">Month: {{monthName}}</label>
+        <br>
+        <mat-slider [disabled]="granularChoosen==1" #slider min="1" max="12" step="1" value="1" (input)="onMonthChange($event)"></mat-slider>
+      </div>
+      <div *ngIf="displayQuarterData" class="col-md-4">
+        <label for="QuarterSelected">Quarter: {{quarterChoosen}}</label>
+        <br>
+        <mat-slider [disabled]="granularChoosen==1" #slider min="1" max="3" step="1" value="1" (input)="onQuarterChange($event)"></mat-slider>
+      </div>
+      <div class="col-md-4">
+        <mat-radio-group (change)="onGranularChange($event)" aria-label="Select an option">
+          <mat-radio-button [checked]="true" value="1">Annual</mat-radio-button>
+          <mat-radio-button value="2">Month</mat-radio-button>
+          <mat-radio-button value="3">Quarter</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div class="col-md-4">
+        <mat-form-field>
+          <input matInput [matDatepicker]="dp" placeholder="Year" [formControl]="yearObj">
+          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp startView="multi-year" (yearSelected)="choosenYearHandler($event,dp)"
+            panelClass="example-month-picker">
+          </mat-datepicker>
+        </mat-form-field>
+        <!--button class="btn btn-primary"
+          (click)="displayMonthData = !displayMonthData;displayQuarterData=!displayQuarterData">Check</!--button-->
+      </div>
     </div>
   </div>
   <div class="row">
