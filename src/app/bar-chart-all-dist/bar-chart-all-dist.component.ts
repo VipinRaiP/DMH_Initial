@@ -78,7 +78,7 @@ export class BarChartAllDistComponent implements OnInit {
   private fromDate: string;
   private toDate: string;
 
-  private year: number;
+  private year: number = new Date().getFullYear();
   private quarterData: any;
   private monthlyData: any;
   private annualData: any;
@@ -147,8 +147,12 @@ export class BarChartAllDistComponent implements OnInit {
       fromDate: this.fromDate,
       toDate: this.toDate
     }
-    this.getData(postData);
+    //this.getData(postData);
     //console.log(document.getElementById("slider"));
+    this.getYearData(this.year);
+    this.updateData();
+    this.createChart();
+    this.updateChart();
   }
 
   addFromDate(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -274,7 +278,7 @@ export class BarChartAllDistComponent implements OnInit {
   updateChart() {
     console.log("Data to chart")
     console.log(this.data);
-    let xValue = 'DistrictId';
+    let xValue = 'District';
     let yValue = this.chartParameters.columnName;
 
     //.......................
@@ -402,6 +406,7 @@ export class BarChartAllDistComponent implements OnInit {
    *  
    * *********************************************************************************************************************/
 
+
   getYearData(year: number) {
     console.log(year)
     let postData = {
@@ -426,6 +431,7 @@ export class BarChartAllDistComponent implements OnInit {
         console.log("Data received");
         console.log(responseData);
         this.monthlyData = responseData;
+        this.updateData();
       })
   }
 
@@ -433,22 +439,27 @@ export class BarChartAllDistComponent implements OnInit {
 
   choosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
     console.log("year called : " + normalizedYear.year())
+    //this.radioPresent=!this.radioPresent;
     const ctrlValue = this.yearObj.value;
     ctrlValue.year(normalizedYear.year());
     this.yearObj.setValue(ctrlValue);
     datepicker.close();
     this.year = normalizedYear.year();
+    this.annualData = [];
+    this.monthlyData = [];
+    this.quarterData = [];
     this.getYearData(this.year);
   }
 
   getMonthData() {
     console.log(this.monthlyData)
     //this.monthChoosen = 6;
-    return this.monthlyData[this.monthChoosen];
+    let monthDataTemp =  this.monthlyData[this.monthChoosen];
+    return (this.monthlyData[this.monthChoosen]==null)?[]:this.monthlyData[this.monthChoosen] ;
   }
 
   getQuarterData() {
-    return this.quarterData[this.quarterChoosen];
+    return (this.quarterData[this.quarterChoosen]==null)?[]:this.quarterData[this.quarterChoosen];
   }
 
   /* *********************************************************************************************************************
