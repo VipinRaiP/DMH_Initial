@@ -1,8 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild, Input } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import * as d3 from 'd3';
-import { BarChartAllDistService } from '../services/barchartAllDist.service';
-import { BarChartAllDistParameters } from '../model/barchartAllDistParameters.model';
+import { BarChartAllDistService } from '../../services/barchartAllDist.service';
+import { BarChartAllDistParameters } from '../../model/barchartAllDistParameters.model';
 import { Title } from "@angular/platform-browser";
 import * as $ from 'jquery';
 import { Options } from 'ng5-slider';
@@ -12,8 +12,9 @@ import { FormControl } from '@angular/forms';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { default as _rollupMoment, Moment } from 'moment';
-import { ChildActivationStart } from '@angular/router';
-
+import { ChildActivationStart, Routes, Router } from '@angular/router';
+import { LineChartPerDistParameters } from '../../model/linechartPerDistParameters.model';
+import { LineChartPerDistService } from '../../services/lineChartPerDist.service';
 
 //import moment = require('moment');
 
@@ -34,14 +35,11 @@ export const MY_FORMATS = {
   },
 };
 
-
 @Component({
   selector: 'app-bar-chart-all-dist',
   templateUrl: './bar-chart-all-dist.component.html',
   styleUrls: ['./bar-chart-all-dist.component.css',
-    '../../../node_modules/jquery-ui-dist/jquery-ui.min.css',
-    '../../../node_modules/jquery-ui-dist/jquery-ui.structure.min.css',
-    '../../../node_modules/jquery-ui-dist/jquery-ui.theme.min.css'],
+    ],
   providers: [
     // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
     // application's root module. We provide it at the component level here, due to limitations of
@@ -58,7 +56,7 @@ export const MY_FORMATS = {
 
 export class BarChartAllDistComponent implements OnInit {
   @ViewChild('chart', { static: true }) private chartContainer: ElementRef;
-  private data: Array<any>;
+  private data: Array<any> = [];
   private margin: any = { top: 40, bottom: 20, left: 50, right: 20 };
   private chart: any;
   private width: number;
@@ -89,8 +87,10 @@ export class BarChartAllDistComponent implements OnInit {
   private displayMonthData = false;
   private displayQuarterData = false;
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
+  private dataURL: any;
 
-  constructor(private elementRef: ElementRef, private http: HttpClient, private barChartService: BarChartAllDistService, private titleService: Title) { }
+  constructor(private elementRef: ElementRef, private http: HttpClient, private barChartService: BarChartAllDistService, private titleService: Title,
+    private linechartPerDistService: LineChartPerDistService, private router: Router) { }
 
   ngOnInit() {
 
@@ -128,6 +128,10 @@ export class BarChartAllDistComponent implements OnInit {
       { DistrictId: 37, AlcoholCases: 28236 }
     ];*/
     console.log("Getting barchart.............");
+   /* this.barChartService.getParametersUpdateListener().subscribe( (barCharParams:BarChartAllDistParameters)=>{
+        console.log(this.chartParameters);
+        this.chartParameters = this.chartParameters;
+    })*/
     this.chartParameters = this.barChartService.getParameters();
     console.log(this.chartParameters);
     if (this.chartParameters != null) {
@@ -141,43 +145,11 @@ export class BarChartAllDistComponent implements OnInit {
     this.titleService.setTitle(this.chartParameters.yLabel);
     console.log(this.chartParameters);
     this.createChart();
-    this.fromDate = "2017-12-01";
-    this.toDate = this.formatTime(new Date());
-    let postData = {
-      fromDate: this.fromDate,
-      toDate: this.toDate
-    }
-    this.getData(postData);
-    //console.log(document.getElementById("slider"));
-  }
-
-  addFromDate(type: string, event: MatDatepickerInputEvent<Date>) {
-    console.log("From Date added");
-    console.log(type);
-    console.log(event.value);
-    console.log(this.formatTime(event.value))
-    this.fromDate = this.formatTime(event.value);
-  }
-
-  addToDate(type: string, event: MatDatepickerInputEvent<Date>) {
-    console.log("To Date added");
-    console.log(type);
-    console.log(event.value);
-    console.log(this.formatTime(event.value))
-    this.toDate = this.formatTime(event.value);
-  }
-
-
-  onClickGetChart() {
-    let postData = {
-      fromDate: this.fromDate,
-      toDate: this.toDate
-    }
-    console.log("clicked")
-    console.log(postData);
-    this.getData(postData);
+    this.dataURL = this.chartParameters.dataURL;
     this.updateChart();
   }
+
+  /* Set up the chart */
 
   createChart() {
     let element = this.chartContainer.nativeElement;
@@ -253,28 +225,14 @@ export class BarChartAllDistComponent implements OnInit {
       .text("More than " + this.chartParameters.threshold)
       .style("font-size", "15px")
       .attr("alignment-baseline", "middle");
-
-    // Add jQuery UI slider
-
-    /*($("#date-slider")as any).slider({
-      range: true,
-      //max: parseTime("31/10/2017").getTime(),
-      max: new Date().getTime(),
-      min: this.parseTime("12/8/2017").getTime(),
-      step: 86400000, // One day
-      values: [this.parseTime("12/8/2017").getTime(), new Date().getTime()],
-      slide: function (event, ui) {
-        $("#dateLabel1").text(this.formatTime(new Date(ui.values[0])));
-        $("#dateLabel2").text(this.formatTime(new Date(ui.values[1])));
-      }
-    });*/
-
   }
+
+  /* Update the chart with data */
 
   updateChart() {
     console.log("Data to chart")
     console.log(this.data);
-    let xValue = 'DistrictId';
+    let xValue = 'District';
     let yValue = this.chartParameters.columnName;
 
     //.......................
@@ -332,10 +290,13 @@ export class BarChartAllDistComponent implements OnInit {
     rects
       .enter()
       .append('rect')
+      .attr("class", "bar")
+      .on("click", drillPerDist)
       .attr('x', d => this.chartOffset + this.xScale(d[xValue]))
       .attr('y', d => this.yScale(0))
       .attr('width', this.xScale.bandwidth)
       .attr('height', 0)
+      .attr("cursor", "pointer")
       .style('fill', d => {
         if (d[yValue] > this.chartParameters.threshold)
           return 'red'
@@ -345,9 +306,56 @@ export class BarChartAllDistComponent implements OnInit {
       .transition()
       .attr('y', d => this.yScale(d[yValue]))
       .attr('height', d => this.height - this.axisShortOffset - this.yScale(d[yValue]))
+
+
+    /* Bar chart on click naviagate to Per disrct line chart */
+
+    let xScale_copy = this.xScale;
+    let columnName_copy = this.chartParameters.columnName;  
+    let linechartPerDistService_copy = this.linechartPerDistService;
+    let router_copy = this.router;
+    function drillPerDist(actualData,mappedValue) {
+      //d3.select(this).attr(‘opacity’, 1)
+      console.log("bar clicked");
+      
+      let linechartParameters: LineChartPerDistParameters;
+      linechartParameters = resolvePerDistParameter(actualData.DistrictId, columnName_copy,actualData.District);
+      console.log(linechartParameters);
+      linechartPerDistService_copy.updateParameters(linechartParameters);
+      router_copy.navigate(["perDist"]);
+      //window.open("/lineChartPerDist")
+      //router_copy.navigate([]).then(result => {  window.open("lineChartPerDist?year="+this.year, '_blank'); });
+    }
+
+    /* Resolve parameters */
+    let year_copy = this.year;
+    function resolvePerDistParameter(districtId, parameter,district) {
+      if (parameter == "AlcoholCases") {
+        return {
+          yLabel: "Alcohol Cases",
+          data: "getAlcoholDataPerDist",
+          threshold: 30,
+          columnName: "AlcoholCases",
+          districtId: districtId,
+          district :district,
+          year: year_copy
+        }
+      }
+      if (parameter == "SuicideCases") {
+        return {
+          yLabel: "Suicide Cases",
+          data: "getSuicideDataPerDist",
+          threshold: 6,
+          columnName: "SuicideCases",
+          districtId: districtId,
+          district:district,
+          year: year_copy
+        }
+      }
+    }
   }
 
-  getData(postData) {
+  /*getData(postData) {
     this.http.post<any>("http://localhost:3000/" + this.chartParameters.data, postData)
       .subscribe(responseData => {
         console.log("Data received");
@@ -355,134 +363,16 @@ export class BarChartAllDistComponent implements OnInit {
         this.data = responseData;
         this.updateChart();
       })
+  }*/
+
+  /* Year chaange event Handler */
+
+  onYearChangeHandler(event) {
+    console.log("year change received");
+    console.log(event);
+    this.data = event.data;
+    this.year = event.year;
+    this.updateChart();
   }
-
-  /* *********************************************************************************************************************
-   * Setting the inputs from user 
-   *
-   * ********************************************************************************************************************/
-
-  onMonthChange(event: any) {
-    this.monthChoosen = event.value;
-    this.monthName = this.months[this.monthChoosen - 1];
-    console.log("Month changed");
-    console.log(event.value);
-    this.updateData();
-  }
-
-  onQuarterChange(event: any) {
-    console.log("Quarter changed " + event.value);
-    this.quarterChoosen = event.value;
-    this.updateData();
-  }
-
-  onGranularChange(event: any) {
-    console.log("Granular changed" + event.value)
-    this.granularChoosen = +event.value;
-    switch(this.granularChoosen){
-      case 2:
-          console.log("choosed")
-          this.displayMonthData = true;
-          this.displayQuarterData = false;
-          break;
-      case 3:
-        this.displayMonthData = false;
-        this.displayQuarterData = true;
-        break;
-      case 1:
-        this.displayMonthData = false;
-        this.displayQuarterData = false;  
-    }
-    this.updateData();
-  }
-
-  /* *********************************************************************************************************************
-   * Get the monthly quarterly and annual data for a year selected  
-   *
-   *  
-   * *********************************************************************************************************************/
-
-  getYearData(year: number) {
-    console.log(year)
-    let postData = {
-      year: year
-    }
-    this.http.post<any>("http://localhost:3000/" + "getAlcoholDataAllDistAnnually", postData)
-      .subscribe(responseData => {
-        console.log("Data received");
-        console.log(responseData);
-        this.annualData = responseData;
-      })
-
-    this.http.post<any>("http://localhost:3000/" + "getAlcoholDataAllDistQuart", postData)
-      .subscribe(responseData => {
-        console.log("Data received");
-        console.log(responseData);
-        this.quarterData = responseData;
-      })
-
-    this.http.post<any>("http://localhost:3000/" + "getAlcoholDataAllDistMonthly", postData)
-      .subscribe(responseData => {
-        console.log("Data received");
-        console.log(responseData);
-        this.monthlyData = responseData;
-      })
-  }
-
-  private yearObj = new FormControl(moment());
-
-  choosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
-    console.log("year called : " + normalizedYear.year())
-    const ctrlValue = this.yearObj.value;
-    ctrlValue.year(normalizedYear.year());
-    this.yearObj.setValue(ctrlValue);
-    datepicker.close();
-    this.year = normalizedYear.year();
-    this.getYearData(this.year);
-  }
-
-  getMonthData() {
-    console.log(this.monthlyData)
-    //this.monthChoosen = 6;
-    return this.monthlyData[this.monthChoosen];
-  }
-
-  getQuarterData() {
-    return this.quarterData[this.quarterChoosen];
-  }
-
-  /* *********************************************************************************************************************
-  *  Update the data as per granualarity
-  *
-  *  
-  * *********************************************************************************************************************/
-
-  updateData() {
-
-    if (this.granularChoosen == 1) {
-      /* Annual */
-      this.data = this.annualData;
-      console.log("Annual data");
-      console.log(this.data);
-      this.updateChart();
-    }
-    else if (this.granularChoosen == 2) {
-      /* Monthly */
-      console.log("Montly data for " + this.monthChoosen);
-      console.log(this.monthlyData);
-      this.data = this.getMonthData();
-      console.log(this.data);
-      this.updateChart();
-    }
-    else if (this.granularChoosen == 3) {
-      /* Quarterly */
-      console.log("Quarter data for " + this.quarterChoosen);
-      console.log(this.quarterData);
-      this.data = this.getQuarterData();
-      console.log(this.data)
-      this.updateChart();  
-    }
-  }
-
 
 }

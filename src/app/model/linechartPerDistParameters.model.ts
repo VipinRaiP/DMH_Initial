@@ -3,5 +3,7 @@ export interface LineChartPerDistParameters{
     data:string,
     threshold:number,
     columnName:string,
-    districtId:number
+    districtId:number,
+    district:string,
+    year:number
 }

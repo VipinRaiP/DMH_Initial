@@ -32,6 +32,11 @@ export class HomeComponentComponent implements OnInit {
         data : "getAlcoholDataAllDist",
         threshold : 3000,
         columnName : "AlcoholCases",
+        dataURL :   {
+          Annual:"getAlcoholDataAllDistAnnually",
+          Quarter: "getAlcoholDataAllDistQuart",
+          Monthly:"getAlcoholDataAllDistMonthly"
+          }
       }
       this.barchartService.updateParameters(parameters);
     }
@@ -41,6 +46,11 @@ export class HomeComponentComponent implements OnInit {
         data : "getSuicideDataAllDist",
         threshold : 3000,
         columnName : "SuicideCases",
+        dataURL: {
+          Annual:"getSuicideDataAllDistAnnually",
+          Quarter: "getSuicideDataAllDistQuart",
+          Monthly:"getSuicideDataAllDistMonthly"
+        }
       }
       this.barchartService.updateParameters(parameters);
     }
@@ -64,7 +74,9 @@ resolvePerDistParameter(districtId,parameter){
       data : "getAlcoholDataPerDist",
       threshold : 30,
       columnName : "AlcoholCases",
-      districtId: districtId
+      districtId: districtId,
+      district:null,
+      year:2018
     }
   }
   if(parameter=="suicideCases"){
@@ -73,11 +85,10 @@ resolvePerDistParameter(districtId,parameter){
       data : "getSuicideDataPerDist",
       threshold : 6,
       columnName : "SuicideCases",
-      districtId: districtId
+      districtId: districtId,
+      district:null,
+      year:2018
     }
   }
 }
-
-
-
 }

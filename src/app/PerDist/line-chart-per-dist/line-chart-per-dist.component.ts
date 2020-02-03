@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, Input } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material';
 import * as d3 from 'd3';
 import { HttpClient } from '@angular/common/http';
 import { Title } from '@angular/platform-browser';
-import { LineChartPerDistParameters } from '../model/linechartPerDistParameters.model';
-import { LineChartPerDistService } from '../services/lineChartPerDist.service';
+import { LineChartPerDistParameters } from '../../model/linechartPerDistParameters.model';
+import { LineChartPerDistService } from '../../services/lineChartPerDist.service';
+import { ActivatedRoute, Params } from '@angular/router';
 
 
 @Component({
@@ -15,7 +16,7 @@ import { LineChartPerDistService } from '../services/lineChartPerDist.service';
 })
 export class LineChartPerDistComponent implements OnInit {
   @ViewChild('chart', { static: true }) private chartContainer: ElementRef;
-  public data: Array<any>;
+  public data: Array<any> = [];
   private margin: any = { top: 40, bottom: 20, left: 50, right: 20 };
   private chart: any;
   private width: number;
@@ -37,25 +38,26 @@ export class LineChartPerDistComponent implements OnInit {
   private xColumnName: string = "ReportingMonthyear";
   private path: any;
   private line: d3.Line<[number, number]>; // this is line defination
-  
+  private year:number;
+  private district:string;
 
-
-  constructor(private http: HttpClient, private lineChartService: LineChartPerDistService, private titleService: Title) { }
+  constructor(private http: HttpClient, private lineChartService: LineChartPerDistService, private titleService: Title,
+      private route:ActivatedRoute) { }
 
   ngOnInit() {
     console.log("Getting linechart.............");
-    this.chartParameters = this.lineChartService.getParameters();
+    this.chartParameters = this.lineChartService.getParameters(); 
     console.log(this.chartParameters);
-    if (this.chartParameters != null) {
+    /*if (this.chartParameters != null) {
       console.log("is not null");
       localStorage.setItem("chartParameters", JSON.stringify(this.chartParameters));
     }
     else {
       this.chartParameters = JSON.parse(localStorage.getItem("chartParameters"));
       console.log("Parsed" + this.chartParameters);
-    }
+    }*/
     this.titleService.setTitle(this.chartParameters.yLabel);
-    console.log(this.chartParameters);
+    console.log(this.chartParameters);    
     this.createChart();
     this.fromDate = new Date(2017, 12, 12).getTime();
     this.toDate = new Date().getTime();
@@ -64,7 +66,23 @@ export class LineChartPerDistComponent implements OnInit {
       fromDate: this.fromDate,
       toDate: this.toDate
     }
-    this.getData(postData);
+    //this.updateChart();
+    this.year = this.chartParameters.year;
+    this.district = this.chartParameters.district;
+    if(this.chartParameters== undefined){
+      console.log("undefined parameters")
+      this.data = [];
+      this.updateChart();
+    }
+    else  
+      this.getData(postData);
+    /* reload comoonent on parameter change */
+    this.lineChartService.getParametersUpdateListener().subscribe( (newChartParameters)=>{
+      console.log("Parameter changed");
+      this.chartParameters = newChartParameters;
+      //this.updateChart();
+      this.getData(postData);
+    });
   }
 
   addFromDate(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -197,6 +215,7 @@ export class LineChartPerDistComponent implements OnInit {
   updateChart() {
     //this.dataPreprocessing();    
     console.log("update called");
+    console.log(this.year);
     var t = function () { return d3.transition().duration(1000); }
 
     let xValue = this.xColumnName;
@@ -205,9 +224,14 @@ export class LineChartPerDistComponent implements OnInit {
     /* filter date */
 
     let dataFiltered = this.data.filter(d => {
-      return (
+      /*return (
         d[this.xColumnName] >= this.fromDate && d[this.xColumnName] <= this.toDate
-      );
+      ); */
+      console.log(new Date(d[this.xColumnName]).getFullYear())
+      return (
+        new Date(d[this.xColumnName]).getFullYear() == this.year
+      );    
+
     });
 
     console.log("Filtered");
@@ -218,6 +242,7 @@ export class LineChartPerDistComponent implements OnInit {
 
     // define X & Y domains
     //let xDomain = this.data.map(d => this.parseTime(d[this.xColumnName]));
+    console.log(this.xColumnName);
     let xDomain = d3.extent(dataFiltered, d => d[this.xColumnName]);
     let yDomain = [0, d3.max(dataFiltered, d => d[yValue])];
 
@@ -394,13 +419,28 @@ export class LineChartPerDistComponent implements OnInit {
       .subscribe(responseData => {
         console.log("Data received before");
         this.data = responseData;
-        console.log(this.data);
+        console.log(this.data[0]);
+        this.district = this.data[0]['District'];
         this.dataPreprocessing();
         this.updateChart();
       })
   }
 
-   
+  updateData(event){
+    console.log("received")
+    console.log(event);
+    this.data = event;
+    this.updateChart();
+  }
+
+  /* On year change update chart */
+
+  onYearChange(event){
+    console.log("Year change received :" + event);
+    this.year = event;
+    this.updateChart();
+  }
+
 
 
 

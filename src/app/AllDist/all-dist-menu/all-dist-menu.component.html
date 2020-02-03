@@ -1,0 +1,20 @@
+<div id="main">
+    <form #f="ngForm" (ngSubmit)="onSubmit(f)">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <select ngModel class="form-control select" name="parameter">
+                        <option selected value="">Alcohol Cases</option>
+                        <option value="SuicideCases">Suicide Cases</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" type="submit">Get Chart</button>
+            </div>
+        </div>
+    </form>
+
+    <app-bar-chart-all-dist *ngIf="paramNumber==1"></app-bar-chart-all-dist>
+    <app-bar-chart-all-dist *ngIf="paramNumber==2"></app-bar-chart-all-dist>
+</div>

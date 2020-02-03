@@ -1,0 +1,18 @@
+<!--nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#">{{chartParameters.yLabel}}</a>
+  </div>
+
+  <ul>
+    <li id="home"><a routerLink="/">HOME</a></li>
+  </ul>
+</nav-->
+
+<!-- Bootstrap grid setup -->
+
+ <div class="container">
+    <app-granular [dataURL]="dataURL" (yearChange)="onYearChangeHandler($event)"></app-granular>
+  <div class="row">
+    <div #chart id="chart-area"></div>
+  </div>
+</div>
