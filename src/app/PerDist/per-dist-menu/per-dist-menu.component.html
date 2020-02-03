@@ -1,0 +1,30 @@
+<div id="main">
+    <form #f="ngForm" (ngSubmit)="onSubmit(f)">
+        <div class="row">
+            <div class="col-md-2 form-group">
+                <select ngModel class="form-control" name="districtId">
+                    <option value="" selected disabled>Select District Id</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+            </div>
+            <div class="col-md-2 form-group">
+                <select ngModel class="form-control" name="parameter">
+                    <option value="" selected disabled>Select Parameter</option>
+                    <option value="alcoholCases">Alcohol Cases</option>
+                    <option value="suicideCases">Suicide Cases</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" type="submit">Get Chart</button>
+            </div>
+        </div>
+    </form>
+
+    <app-line-chart-per-dist *ngIf="0==paramNumber"></app-line-chart-per-dist>
+    <app-line-chart-per-dist *ngIf="1==paramNumber"></app-line-chart-per-dist>
+    <app-line-chart-per-dist *ngIf="2==paramNumber"></app-line-chart-per-dist>
+    <app-line-chart-per-dist *ngIf="3==paramNumber"></app-line-chart-per-dist>
+
+</div>

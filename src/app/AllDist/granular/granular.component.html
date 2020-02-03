@@ -1,17 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container">
-    <a class="navbar-brand" href="#">{{chartParameters.yLabel}}</a>
-  </div>
 
-  <ul>
-    <li id="home"><a routerLink="/">HOME</a></li>
-  </ul>
-</nav>
-
-<!-- Bootstrap grid setup -->
-
-<div class="container">
-  <div class="container">
     <div class="row">
       <div *ngIf="displayMonthData" class="col-md-4">
         <label for="MonthSelected">Month: {{monthName}}</label>
@@ -42,8 +29,4 @@
           (click)="displayMonthData = !displayMonthData;displayQuarterData=!displayQuarterData">Check</!--button-->
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div #chart id="chart-area"></div>
-  </div>
-</div>
+  
