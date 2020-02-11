@@ -2,7 +2,19 @@
     <a routerLink="/" class="navbar-brand">Home</a>
 
     <ul class="navbar-nav">
-        <li class="nav-item" routerLinkActive="active"><a class="nav-link" routerLink="/allDist">All Dist</a></li>
+        <!--li class="nav-item" routerLinkActive="active"><a class="nav-link" routerLink="/allDist">All Dist</a></!li-->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                Views
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" routerLink="/stateView">State</a>
+                <a class="dropdown-item" routerLink="/allDist">Districts</a>
+                <!--div class="dropdown-divider"></div-->
+                <a class="dropdown-item" href="#">Taluks</a>
+            </div>
+        </li>
         <li class="nav-item" routerLinkActive="active"><a class="nav-link" routerLink="/perDist">Per Dist</a></li>
     </ul>
 </nav>

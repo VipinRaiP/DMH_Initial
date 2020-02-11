@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, Injectable } from '@angular/core';
 import { MatDatepickerInputEvent, MatDatepicker } from '@angular/material';
 import * as _moment from 'moment';
 import { FormControl } from '@angular/forms';
@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { ChildActivationStart } from '@angular/router';
+import { BarChartAllDistService } from 'src/app/services/barchartAllDist.service';
 
 const moment = _rollupMoment || _moment; _moment;
 
@@ -57,6 +58,7 @@ export class GranularComponent implements OnInit {
   private displayMonthData = false;
   private displayQuarterData = false;
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
+  private parameter: string;
 
   @Input()
   dataURL: any;
@@ -66,13 +68,33 @@ export class GranularComponent implements OnInit {
   @Output()
   yearChange = new EventEmitter<any>()
 
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient, private dataReqService: BarChartAllDistService) { }
 
   ngOnInit() {
     console.log("granular: ")
     console.log("url");
     console.log(this.dataURL);
+    /*this.dataReqService.getDataReqListener().subscribe((d) => {
+      console.log("Data req received")
+      console.log(d);
+      this.year = d.year;
+      this.granularChoosen = d.granular;
+      if (d.granular == 2)
+        this.monthChoosen = d.choosenValue;
+      else if (d.granular == 3)
+        this.quarterChoosen = d.choosenValue;  
+        this.getYearData(this.year);
+    })*/
+    let d = this.dataReqService.getDataReq();
+    console.log(d);
+    this.year = d.year;
+    this.granularChoosen = d.granular;
+    if (d.granular == 2)
+      this.monthChoosen = d.choosenValue;
+    else if (d.granular == 3)
+      this.quarterChoosen = d.choosenValue;
     this.getYearData(this.year);
+
   }
 
   onClick() {
@@ -134,9 +156,9 @@ export class GranularComponent implements OnInit {
     let postData = {
       year: year
     }
-    this.http.post<any>("http://localhost:3000/" + this.dataURL['Annual'] , postData)
+    this.http.post<any>("http://localhost:3000/" + this.dataURL['Annual'], postData)
       .subscribe(responseData => {
-        console.log("Data received");
+        console.log("Data received " + year);
         console.log(responseData);
         this.annualData = responseData;
       })
@@ -211,13 +233,16 @@ export class GranularComponent implements OnInit {
       this.data = this.getQuarterData();
       console.log(this.data)
     }
-    this.yearChange.emit({
-      data : this.data,
-      year : this.year
-    });
+    /*this.yearChange.emit({
+      data: this.data,
+      year: this.year
+    });*/
+    let sendingData = {
+      year: this.year,
+      granular: this.granularChoosen,
+      choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
+      data: this.data,
+    }
+    this.dataReqService.updateChartData(sendingData);
   }
-
-
-
-
 }

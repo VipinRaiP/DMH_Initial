@@ -5,6 +5,8 @@ import { HomeComponentComponent } from './home-component/home-component.componen
 import { LineChartPerDistComponent } from './PerDist/line-chart-per-dist/line-chart-per-dist.component';
 import { AllDistMenuComponent } from './AllDist/all-dist-menu/all-dist-menu.component';
 import { PerDistMenuComponent } from './PerDist/per-dist-menu/per-dist-menu.component';
+import { StateViewMenuComponent } from './StateView/state-view-menu/state-view-menu.component';
+import { BarChartStateComponent } from './StateView/bar-chart-state/bar-chart-state.component';
 
 const appRoutes :Routes = [
     {path: 'barChartAllDist',component:BarChartAllDistComponent},
@@ -23,6 +25,17 @@ const appRoutes :Routes = [
         children:[
             {path:'lineChart',component:LineChartPerDistComponent}
         ]    
+    },
+    {
+        path: 'stateView',
+        component : StateViewMenuComponent,
+        children :[
+            {path:'barChart', component: BarChartStateComponent},
+        ]
+    },
+    { 
+        path:'distView/:paramNumber',
+        component:AllDistMenuComponent
     }
 ];
 

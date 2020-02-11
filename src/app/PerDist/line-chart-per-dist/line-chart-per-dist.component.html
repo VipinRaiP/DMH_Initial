@@ -34,14 +34,17 @@
     <app-granular-per-dist (yearChange)="onYearChange($event)"></app-granular-per-dist>
   </div>
   <div class="row">
-    <div #chart id="chart-area"></div>
-  </div>
-  <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <label for="Year Choosen">Year : {{year}}</label>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <label for="District choosen">District : {{district}}</label>
     </div>
+    <div class="col-md-4">
+      <button class="btn btn-primary">Get Taluk View</button>
+    </div>
+  </div>
+  <div class="row">
+    <div #chart id="chart-area"></div>
   </div>
 </div>
