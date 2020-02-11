@@ -15,6 +15,7 @@ import { default as _rollupMoment, Moment } from 'moment';
 import { ChildActivationStart, Routes, Router } from '@angular/router';
 import { LineChartPerDistParameters } from '../../model/linechartPerDistParameters.model';
 import { LineChartPerDistService } from '../../services/lineChartPerDist.service';
+import { curveNatural } from 'd3';
 
 //import moment = require('moment');
 
@@ -39,7 +40,7 @@ export const MY_FORMATS = {
   selector: 'app-bar-chart-all-dist',
   templateUrl: './bar-chart-all-dist.component.html',
   styleUrls: ['./bar-chart-all-dist.component.css',
-    ],
+  ],
   providers: [
     // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
     // application's root module. We provide it at the component level here, due to limitations of
@@ -88,6 +89,8 @@ export class BarChartAllDistComponent implements OnInit {
   private displayQuarterData = false;
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
   private dataURL: any;
+  choosenValue: any;
+  granular: number;
 
   constructor(private elementRef: ElementRef, private http: HttpClient, private barChartService: BarChartAllDistService, private titleService: Title,
     private linechartPerDistService: LineChartPerDistService, private router: Router) { }
@@ -128,25 +131,37 @@ export class BarChartAllDistComponent implements OnInit {
       { DistrictId: 37, AlcoholCases: 28236 }
     ];*/
     console.log("Getting barchart.............");
-   /* this.barChartService.getParametersUpdateListener().subscribe( (barCharParams:BarChartAllDistParameters)=>{
-        console.log(this.chartParameters);
-        this.chartParameters = this.chartParameters;
-    })*/
+    /* this.barChartService.getParametersUpdateListener().subscribe( (barCharParams:BarChartAllDistParameters)=>{
+         console.log(this.chartParameters);
+         this.chartParameters = this.chartParameters;
+     })*/
     this.chartParameters = this.barChartService.getParameters();
     console.log(this.chartParameters);
-    if (this.chartParameters != null) {
+   /* if (this.chartParameters != null) {
       console.log("is not null");
       localStorage.setItem("chartParameters", JSON.stringify(this.chartParameters));
     }
     else {
       this.chartParameters = JSON.parse(localStorage.getItem("chartParameters"));
       console.log("Parsed" + this.chartParameters);
-    }
+    }*/
     this.titleService.setTitle(this.chartParameters.yLabel);
     console.log(this.chartParameters);
     this.createChart();
     this.dataURL = this.chartParameters.dataURL;
     this.updateChart();
+
+    this.barChartService.getChartDataListener().subscribe((d) => {
+      console.log("Barchart Data changed");
+      console.log(d);
+      this.data = d.data;
+      this.year = d.year;
+      this.granular = d.granular;
+      this.choosenValue = d.choosenValue;
+      if (this.granular == 2)
+        this.monthName = this.months[this.choosenValue-1];
+      this.updateChart();
+    })
   }
 
   /* Set up the chart */
@@ -311,15 +326,15 @@ export class BarChartAllDistComponent implements OnInit {
     /* Bar chart on click naviagate to Per disrct line chart */
 
     let xScale_copy = this.xScale;
-    let columnName_copy = this.chartParameters.columnName;  
+    let columnName_copy = this.chartParameters.columnName;
     let linechartPerDistService_copy = this.linechartPerDistService;
     let router_copy = this.router;
-    function drillPerDist(actualData,mappedValue) {
+    function drillPerDist(actualData, mappedValue) {
       //d3.select(this).attr(‘opacity’, 1)
       console.log("bar clicked");
-      
+
       let linechartParameters: LineChartPerDistParameters;
-      linechartParameters = resolvePerDistParameter(actualData.DistrictId, columnName_copy,actualData.District);
+      linechartParameters = resolvePerDistParameter(actualData.DistrictId, columnName_copy, actualData.District);
       console.log(linechartParameters);
       linechartPerDistService_copy.updateParameters(linechartParameters);
       router_copy.navigate(["perDist"]);
@@ -329,7 +344,7 @@ export class BarChartAllDistComponent implements OnInit {
 
     /* Resolve parameters */
     let year_copy = this.year;
-    function resolvePerDistParameter(districtId, parameter,district) {
+    function resolvePerDistParameter(districtId, parameter, district) {
       if (parameter == "AlcoholCases") {
         return {
           yLabel: "Alcohol Cases",
@@ -337,7 +352,7 @@ export class BarChartAllDistComponent implements OnInit {
           threshold: 30,
           columnName: "AlcoholCases",
           districtId: districtId,
-          district :district,
+          district: district,
           year: year_copy
         }
       }
@@ -348,7 +363,7 @@ export class BarChartAllDistComponent implements OnInit {
           threshold: 6,
           columnName: "SuicideCases",
           districtId: districtId,
-          district:district,
+          district: district,
           year: year_copy
         }
       }

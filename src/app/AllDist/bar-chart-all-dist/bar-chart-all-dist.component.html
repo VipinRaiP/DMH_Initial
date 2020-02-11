@@ -10,8 +10,17 @@
 
 <!-- Bootstrap grid setup -->
 
- <div class="container">
-    <app-granular [dataURL]="dataURL" (yearChange)="onYearChangeHandler($event)"></app-granular>
+<div class="container">
+  <app-granular [dataURL]="dataURL"></app-granular>
+  <div class="row">
+    <div class="col-md-6">
+      <label for="Year Choosen">Year : {{year}}</label>
+    </div>
+    <div class="col-md-6">
+      <label *ngIf="granular==3" for="choosen"> Quarter : {{choosenValue}}</label>
+      <label *ngIf="granular==2" for="choosen">Month : {{monthName}}</label>
+    </div>
+  </div>
   <div class="row">
     <div #chart id="chart-area"></div>
   </div>

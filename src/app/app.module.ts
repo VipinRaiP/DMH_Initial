@@ -20,6 +20,10 @@ import { HeaderComponent } from './header/header.component';
 import { AllDistMenuComponent } from './AllDist/all-dist-menu/all-dist-menu.component';
 import { GranularPerDistComponent } from './PerDist/granular-per-dist/granular-per-dist.component';
 import { PerDistMenuComponent } from './PerDist/per-dist-menu/per-dist-menu.component';
+import { BarChartStateComponent } from './StateView/bar-chart-state/bar-chart-state.component';
+import { StateViewMenuComponent } from './StateView/state-view-menu/state-view-menu.component';
+import { StateViewGranularComponent } from './StateView/state-view-granular/state-view-granular.component';
+import { BarChartStateService } from './services/bar-chart-state.service';
 
 
 @NgModule({
@@ -33,6 +37,9 @@ import { PerDistMenuComponent } from './PerDist/per-dist-menu/per-dist-menu.comp
     AllDistMenuComponent,
     GranularPerDistComponent,
     PerDistMenuComponent,
+    BarChartStateComponent,
+    StateViewMenuComponent,
+    StateViewGranularComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,7 +59,9 @@ import { PerDistMenuComponent } from './PerDist/per-dist-menu/per-dist-menu.comp
   ],
   providers: [BarChartAllDistService,
               LineChartPerDistService,
-              Title],
+              BarChartStateService,
+              Title,
+            ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
