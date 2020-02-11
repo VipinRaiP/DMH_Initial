@@ -36,6 +36,10 @@ const appRoutes :Routes = [
     { 
         path:'distView/:paramNumber',
         component:AllDistMenuComponent
+    },
+    {
+        path:'perDistView/:distId',
+        component: PerDistMenuComponent
     }
 ];
 

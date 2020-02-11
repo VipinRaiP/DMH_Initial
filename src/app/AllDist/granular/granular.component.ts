@@ -87,12 +87,15 @@ export class GranularComponent implements OnInit {
     })*/
     let d = this.dataReqService.getDataReq();
     console.log(d);
-    this.year = d.year;
-    this.granularChoosen = d.granular;
-    if (d.granular == 2)
-      this.monthChoosen = d.choosenValue;
-    else if (d.granular == 3)
-      this.quarterChoosen = d.choosenValue;
+    if(typeof d !='undefined'){
+      console.log("d defined")
+      this.year = d.year;
+      this.granularChoosen = d.granular;
+      if (d.granular == 2)
+        this.monthChoosen = d.choosenValue;
+      else if (d.granular == 3)
+        this.quarterChoosen = d.choosenValue;
+    }    
     this.getYearData(this.year);
 
   }

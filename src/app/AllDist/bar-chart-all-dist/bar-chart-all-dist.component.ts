@@ -337,7 +337,7 @@ export class BarChartAllDistComponent implements OnInit {
       linechartParameters = resolvePerDistParameter(actualData.DistrictId, columnName_copy, actualData.District);
       console.log(linechartParameters);
       linechartPerDistService_copy.updateParameters(linechartParameters);
-      router_copy.navigate(["perDist"]);
+      router_copy.navigate(["perDistView",actualData.DistrictId]);
       //window.open("/lineChartPerDist")
       //router_copy.navigate([]).then(result => {  window.open("lineChartPerDist?year="+this.year, '_blank'); });
     }

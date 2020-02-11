@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { LineChartPerDistService } from 'src/app/services/lineChartPerDist.service';
 import { LineChartPerDistParameters } from 'src/app/model/linechartPerDistParameters.model';
 
@@ -11,11 +11,23 @@ import { LineChartPerDistParameters } from 'src/app/model/linechartPerDistParame
 })
 export class PerDistMenuComponent implements OnInit {
 
-  private paramNumber: number = 0;
+  private choosenDistrictId: number = 0;
+  private distId =[];
 
-  constructor(private router: Router, private linechartPerDistService: LineChartPerDistService) { }
+    
+  constructor(private router: Router, private linechartPerDistService: LineChartPerDistService,
+    private route:ActivatedRoute) { }
 
   ngOnInit() {
+    for(var i=1;i<50;i++){
+      this.distId.push(i);
+    }
+    console.log(this.distId);
+    this.route.params.subscribe((params => {
+      console.log("Parameter Number received: "+params['distId']);
+      this.choosenDistrictId = params['distId'];
+      //this.linechartPerDistService.updateParameters(this.resolvePerDistParameter(this.paramNumber));
+    }))
   }
 
   onSubmit(form: NgForm) {
@@ -29,9 +41,9 @@ export class PerDistMenuComponent implements OnInit {
   /* Resolve parameters */
 
   resolvePerDistParameter(districtId, parameter) {
-    this.paramNumber = districtId;
+    this.choosenDistrictId = districtId;
     if (parameter == "alcoholCases") {
-      console.log("ParamNo : "+this.paramNumber)
+      console.log("ParamNo : "+this.choosenDistrictId)
       return {
         yLabel: "Alcohol Cases",
         data: "getAlcoholDataPerDist",
