@@ -8,6 +8,24 @@
       </mat-datepicker>
     </mat-form-field>
     <!--button class="btn btn-primary"
-          (click)="displayMonthData = !displayMonthData;displayQuarterData=!displayQuarterData">Check</!--button-->
+          (click)="displayMonthData = !displayMonthData;displayQuarterData=!displayQuarterData">Check</button-->
   </div>
 </div>
+
+
+<!--div class="row">
+  <div  class="col-md-4">
+    <label *ngIf="granularChoosen!=1" for="YearSelect">Year: {{year}}</label>
+    <br>
+    <mat-slider [disabled]="granularChoosen==1" #slider min="{{minYear}}" max="{{maxYear}}" step="1" value="1" (input)="onYearChange($event)"></mat-slider>
+  </div>
+  
+  <div class="col-md-4">
+    <mat-radio-group (change)="onGranularChange($event)" aria-label="Select an option">
+      <mat-radio-button [checked]="true" value="1">Year wise</mat-radio-button>
+      <mat-radio-button value="2">Month</mat-radio-button>
+      <mat-radio-button value="3">Quarter</mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div-->
+

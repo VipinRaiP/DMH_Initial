@@ -53,23 +53,34 @@ export class BarChartStateComponent implements OnInit {
   private xColumnName: string;
 
   private parameterNumber: number;
+  private legend_1: any;
+  private legend_2: any;
 
 
   constructor(private elementRef: ElementRef, private http: HttpClient, private barChartService: BarChartStateService, private titleService: Title,
     private linechartPerDistService: LineChartPerDistService, private router: Router, private allDistService: BarChartAllDistService) { }
 
   ngOnInit() {
-    console.log("Getting barchart.............");
-  
-    this.chartParameters = this.barChartService.getParameters();
+    console.log("State barchart loaded");
     this.createChart();
-    this.dataURL = this.chartParameters.dataURL;
-    console.log(this.dataURL);
+    /* Chart parameter change service */
     this.barChartService.getParametersUpdateListener().subscribe((parameters) => {
+      console.log("State chart: parameter update")
+      console.log(parameters);
       this.chartParameters = parameters;
-      this.dataURL = this.chartParameters.dataURL;
-      this.updateChart();
+      localStorage.setItem('parameterNumber', this.chartParameters.parameterNumber + "");
     })
+
+    /* Chart data change service */
+    this.barChartService.getChartDataListener().subscribe( (newData) =>{
+      this.data = newData.data;
+      this.year = newData.year;
+      this.granularChoosen = newData.granular;
+      this.xColumnName = newData.xColumnName;
+      localStorage.setItem('granularChoosen', this.granularChoosen + "");
+      this.updateChart();
+    });
+
   }
 
   /* Set up the chart */
@@ -105,7 +116,7 @@ export class BarChartStateComponent implements OnInit {
       .attr("x", this.width / 2 - 30)
       .attr("font-size", "20px")
       .attr("text-anchor", "middle")
-      .text("District");
+      
 
     // Y Label
     this.yLabel = this.chart.append("text")
@@ -133,19 +144,17 @@ export class BarChartStateComponent implements OnInit {
       .style("fill", "red");
 
 
-    legendGroup
+    this.legend_1 = legendGroup
       .append("text")
       .attr("x", 220)
       .attr("y", 130)
-      .text("Less than " + this.chartParameters.threshold)
       .style("font-size", "15px")
       .attr("alignment-baseline", "middle");
 
-    legendGroup
+    this.legend_2 = legendGroup
       .append("text")
       .attr("x", 220)
       .attr("y", 160)
-      .text("More than " + this.chartParameters.threshold)
       .style("font-size", "15px")
       .attr("alignment-baseline", "middle");
   }
@@ -153,31 +162,27 @@ export class BarChartStateComponent implements OnInit {
   /* Update the chart with data */
 
   updateChart() {
-    console.log("Data to chart")
+    console.log("State chart : Data to chart")
     console.log(this.data);
+    console.log("Granular choosen : " + this.granularChoosen);
     let xValue = this.xColumnName;
     let yValue = this.chartParameters.yColumnName;
     console.log("ycolumn = " + yValue)
-    //.......................
+
+    this.legend_1.text("Less than " + this.chartParameters.threshold);
+    this.legend_2.text("More than " + this.chartParameters.threshold);
 
     // define X & Y domains
     let xDomain = this.data.map(d => d[xValue]);
     let yDomain = [0, d3.max(this.data, d => d[yValue])];
 
-    console.log(yDomain)
     // create scales
     this.xScale = d3.scaleBand().domain(xDomain).rangeRound([0, this.width - this.axisShortOffset]).padding(0.3);
-
     this.yScale = d3.scaleLinear().domain(yDomain).range([this.height - this.axisShortOffset, 0]);
-    console.log(this.height)
-    console.log(this.yScale(100));
-
-    //...................................
 
     // update scales & axis
     this.xScale.domain(this.data.map(d => d[xValue]));
     this.yScale.domain([0, d3.max(this.data, d => d[yValue])]);
-    //  this.colors.domain([0, this.data.length]);
     this.xAxis.transition().call(d3.axisBottom(this.xScale))
       .selectAll("text")
       .attr("y", "3")
@@ -188,6 +193,7 @@ export class BarChartStateComponent implements OnInit {
 
     // add labels
     this.yLabel.text(this.chartParameters.yLabel);
+    this.xLabel.text(this.xColumnName);
 
     let rects = this.chart.selectAll('rect')
       .data(this.data);
@@ -196,7 +202,6 @@ export class BarChartStateComponent implements OnInit {
     rects.exit().remove();
 
     // update existing bars
-    //this.chart.selectAll('rects').transition()
     rects.transition()
       .attr('x', d => this.chartOffset + this.xScale(d[xValue]))
       .attr('y', d => this.yScale(d[yValue]))
@@ -210,11 +215,32 @@ export class BarChartStateComponent implements OnInit {
       })
 
     // add new bars
+    let allDistService_copy = this.allDistService;
     rects
       .enter()
       .append('rect')
       .attr("class", "bar")
-      .on("click", drillDistView)
+     /* .on("click", function (granularChoosen) {
+        return function (actualData, mappedValue) {
+          console.log("State chart : Bar clicked");
+          granularChoosen = +localStorage.getItem('granularChoosen');
+          console.log(actualData);
+          console.log(parameterNumber);
+          console.log(granularChoosen);
+          console.log(year);
+
+          let parameter: BarChartAllDistDataReq;
+
+          parameter = {
+            year: actualData.Year,
+            granular: granularChoosen,
+            choosenValue: (granularChoosen == 1) ? actualData.Year : (granularChoosen == 2) ? monthDict[actualData.Month] : quartDict[actualData.Quarter],
+            parameterNumber: +localStorage.getItem('parameterNumber')
+          }
+          allDistService_copy.createDataReq(parameter);
+        }
+      }(this.granularChoosen))*/
+      .on('click',drillDistView)
       .attr('x', d => this.chartOffset + this.xScale(d[xValue]))
       .attr('y', d => this.yScale(0))
       .attr('width', this.xScale.bandwidth)
@@ -230,18 +256,7 @@ export class BarChartStateComponent implements OnInit {
       .attr('y', d => this.yScale(d[yValue]))
       .attr('height', d => this.height - this.axisShortOffset - this.yScale(d[yValue]))
 
-
-    /* Bar chart on click naviagate to Per disrct line chart */
-
-    let xScale_copy = this.xScale;
-    let columnName_copy = this.chartParameters.yColumnName;
-    let linechartPerDistService_copy = this.linechartPerDistService;
-    let router_copy = this.router;
-
-    let parameterNumber = this.parameterNumber;
-    let granularChoosen = this.granularChoosen;
-    let year = this.year;
-    let allDistService_copy = this.allDistService;
+    /* Drill down to District chart */
 
     let monthDict = {
       "Jan": 1,
@@ -260,33 +275,34 @@ export class BarChartStateComponent implements OnInit {
     let quartDict = {
       "Q1": 1,
       "Q2": 2,
-      "Q3": 3
-    }
-
-    /* Drill down to all district view */
-
+      "Q3": 3,
+      "Q4": 4
+    }  
     function drillDistView(actualData, mappedValue) {
-      console.log("bar clicked");
+      console.log("State chart : Bar clicked");
+      let granularChoosen = +localStorage.getItem('granularChoosen');
+      let parameterNumber = +localStorage.getItem('parameterNumber');
       console.log(actualData);
       console.log(parameterNumber);
       console.log(granularChoosen);
-      console.log(year);
 
       let parameter: BarChartAllDistDataReq;
 
       parameter = {
         year: actualData.Year,
         granular: granularChoosen,
-        choosenValue: (granularChoosen == 1) ? actualData.Year : (granularChoosen == 2) ? monthDict[actualData.Month] : quartDict[actualData.Quarter]
+        choosenValue: (granularChoosen == 1) ? actualData.Year : (granularChoosen == 2) ? monthDict[actualData.Month] : quartDict[actualData.Quarter],
+        parameterNumber: parameterNumber,
+        onSubmit:false
       }
       allDistService_copy.createDataReq(parameter);
-      router_copy.navigate(["distView", parameterNumber]);
     }
+
   }
 
   /* Year chaange event Handler */
 
-  granularChangeHandler(event) {
+/*  granularChangeHandler(event) {
     console.log("year change received");
     console.log(event);
     this.data = event.data;
@@ -294,7 +310,8 @@ export class BarChartStateComponent implements OnInit {
     this.parameterNumber = event.parameterNumber;
     this.granularChoosen = event.granular;
     this.xColumnName = event.xColumnName;
+    localStorage.setItem('granularChoosen', this.granularChoosen + "");
     this.updateChart();
-  }
+  } */
 
 }

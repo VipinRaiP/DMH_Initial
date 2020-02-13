@@ -32,11 +32,6 @@ export class HomeComponentComponent implements OnInit {
         data : "getAlcoholDataAllDist",
         threshold : 3000,
         columnName : "AlcoholCases",
-        dataURL :   {
-          Annual:"getAlcoholDataAllDistAnnually",
-          Quarter: "getAlcoholDataAllDistQuart",
-          Monthly:"getAlcoholDataAllDistMonthly"
-          }
       }
       this.barchartService.updateParameters(parameters);
     }
@@ -46,11 +41,6 @@ export class HomeComponentComponent implements OnInit {
         data : "getSuicideDataAllDist",
         threshold : 3000,
         columnName : "SuicideCases",
-        dataURL: {
-          Annual:"getSuicideDataAllDistAnnually",
-          Quarter: "getSuicideDataAllDistQuart",
-          Monthly:"getSuicideDataAllDistMonthly"
-        }
       }
       this.barchartService.updateParameters(parameters);
     }

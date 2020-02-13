@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BarChartStateParameters } from 'src/app/model/barChartStateParameters.model';
 import { NgForm } from '@angular/forms';
 import { BarChartStateService } from 'src/app/services/bar-chart-state.service';
+import { BarChartStateDataReq } from 'src/app/model/barChartStateDataReq.model';
 
 
 @Component({
@@ -18,44 +19,30 @@ export class StateViewMenuComponent implements OnInit,OnDestroy {
   constructor(private barChartService: BarChartStateService) { }
 
   ngOnInit() {
-      this.barChartService.updateParameters(this.resolveParams(this.paramNumber)); 
+    /* create a new data request */
+    console.log("State chart menu loaded")
+    let newDataReq:BarChartStateDataReq = {
+      onSubmit : true,
+      granular :1,
+      choosenValue: 2017,
+      year: 2017,
+      parameterNumber : 1
+    }
+    this.barChartService.createDataReq(newDataReq);
   }
 
   onSubmit(form: NgForm) {
-    let parameters: BarChartStateParameters;
-    this.paramNumber = form.value.parameter;
-    console.log(this.paramNumber);
-
-    this.barChartService.updateParameters(this.resolveParams(this.paramNumber));
-  }
-
-  resolveParams(paramNumber: number) {
-    if (paramNumber == 1) {
-      return {
-        yLabel: "Alcohol Cases",
-        threshold: 20000,
-        yColumnName: "AlcoholCases", 
-        dataURL: {
-          parameterNumber: 1,
-          Month: "getStateAlcoholDataMonthly",
-          Year: "getStateAlcoholDataYearly",
-          Quarter: "getStateAlcoholDataQuart"
-        }
-      }
+    
+    this.paramNumber = (form.value.parameter=="")?1:form.value.parameter;
+    console.log("State chart : choosen value : "+ this.paramNumber);
+    let newDataReq:BarChartStateDataReq = {
+      onSubmit : true,
+      granular :1,
+      choosenValue: 2017,
+      year: 2017,
+      parameterNumber : this.paramNumber
     }
-    else if (paramNumber == 2) {
-      return {
-        yLabel: "Suicide Cases",
-        threshold: 3000,
-        yColumnName: "SuicideCases",
-        dataURL: {
-          parameterNumber : 2, 
-          Year: "getStateSuicideDataYearly",
-          Quarter: "getStateSuicideDataQuart",
-          Month: "getStateSuicideDataMonthly"
-        }
-      }
-    }
+    this.barChartService.createDataReq(newDataReq);
   }
 
   ngOnDestroy(): void {

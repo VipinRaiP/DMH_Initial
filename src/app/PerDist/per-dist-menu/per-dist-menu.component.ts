@@ -3,6 +3,8 @@ import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LineChartPerDistService } from 'src/app/services/lineChartPerDist.service';
 import { LineChartPerDistParameters } from 'src/app/model/linechartPerDistParameters.model';
+import { AreaChartPerDistParameters } from 'src/app/model/areaChartPerDistParameters.model';
+import { AreaChartPerDistService } from 'src/app/services/areaChartPerDist.service';
 
 @Component({
   selector: 'app-per-dist-menu',
@@ -16,7 +18,7 @@ export class PerDistMenuComponent implements OnInit {
 
     
   constructor(private router: Router, private linechartPerDistService: LineChartPerDistService,
-    private route:ActivatedRoute) { }
+    private route:ActivatedRoute,private areaChartPerDistService:AreaChartPerDistService) { }
 
   ngOnInit() {
     for(var i=1;i<50;i++){
@@ -32,9 +34,11 @@ export class PerDistMenuComponent implements OnInit {
 
   onSubmit(form: NgForm) {
     let linechartParameters: LineChartPerDistParameters;
+   // let linechartParameters : AreaChartPerDistParameters;
     console.log(+form.value.districtId);
     linechartParameters = this.resolvePerDistParameter(+form.value.districtId, form.value.parameter);
     this.linechartPerDistService.updateParameters(linechartParameters);
+    //this.areaChartPerDistService.updateParameters(linechartParameters);
     //this.router.navigate(["perDi"]);
   }
 
@@ -65,7 +69,40 @@ export class PerDistMenuComponent implements OnInit {
         year: 2018
       }
     }
+  } 
+/*
+  resolvePerDistParameter(districtId, parameter) {
+    this.choosenDistrictId = districtId;
+    if (parameter == "alcoholCases") {
+      console.log("ParamNo : "+this.choosenDistrictId)
+      return {
+        yLabel: "Alcohol Cases",
+        dataURL:{
+          "Year" : "getPerDistAlcoholDataYearly",
+          "Month" : "getPerDistAlcoholDataMonthly",
+          "Quarter" : "getPerDistAlcoholDataQuart"  
+        }, 
+        threshold: 30,
+        yColumnName: "AlcoholCases",
+        districtId: districtId,
+      }
+    }
+    else if (parameter == "suicideCases") {
+      return {
+        yLabel: "Suicide Cases",
+        data: "getSuicideDataPerDist",
+        threshold: 6,
+        yColumnName: "SuicideCases",
+        districtId: districtId,
+        dataURL:{
+          "Year" : "getPerDistSuicideDataYearly",
+          "Month" : "getPerDistSuidcideDataMonthly",
+          "Quarter" : "getPerDistSuicideDataQuart"  
+        }
+      }
+    }
   }
+*/
 
 
 }

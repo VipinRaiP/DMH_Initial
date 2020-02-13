@@ -10,6 +10,8 @@ import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/mat
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { ChildActivationStart } from '@angular/router';
 import { BarChartAllDistService } from 'src/app/services/barchartAllDist.service';
+import { BarChartAllDistParameters } from 'src/app/model/barchartAllDistParameters.model';
+import { BarChartAllDistDataReq } from 'src/app/model/barchartAllDistDataReq.model';
 
 const moment = _rollupMoment || _moment; _moment;
 
@@ -59,6 +61,7 @@ export class GranularComponent implements OnInit {
   private displayQuarterData = false;
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
   private parameter: string;
+  private chartParameters: BarChartAllDistParameters;
 
   @Input()
   dataURL: any;
@@ -68,41 +71,19 @@ export class GranularComponent implements OnInit {
   @Output()
   yearChange = new EventEmitter<any>()
 
-  constructor(private http: HttpClient, private dataReqService: BarChartAllDistService) { }
+  constructor(private http: HttpClient, private barChartService: BarChartAllDistService, ) { }
 
   ngOnInit() {
-    console.log("granular: ")
-    console.log("url");
-    console.log(this.dataURL);
-    /*this.dataReqService.getDataReqListener().subscribe((d) => {
-      console.log("Data req received")
-      console.log(d);
-      this.year = d.year;
-      this.granularChoosen = d.granular;
-      if (d.granular == 2)
-        this.monthChoosen = d.choosenValue;
-      else if (d.granular == 3)
-        this.quarterChoosen = d.choosenValue;  
-        this.getYearData(this.year);
-    })*/
-    let d = this.dataReqService.getDataReq();
-    console.log(d);
-    if(typeof d !='undefined'){
-      console.log("d defined")
-      this.year = d.year;
-      this.granularChoosen = d.granular;
-      if (d.granular == 2)
-        this.monthChoosen = d.choosenValue;
-      else if (d.granular == 3)
-        this.quarterChoosen = d.choosenValue;
-    }    
-    this.getYearData(this.year);
+    console.log("All dist Granular loaded");
+    let newDataReq:BarChartAllDistDataReq;
+    newDataReq  = this.barChartService.getDataReq();
+    this.processDataRequest(newDataReq);
+    // Subscribe for further data requests from onsubmit or drill downs
 
-  }
-
-  onClick() {
-    console.log("emitted")
-    this.yearChange.emit(this.data);
+    this.barChartService.getDataReqListener().subscribe((newDataReq) => {
+        this.processDataRequest(newDataReq);
+    })
+  
   }
 
   /* *********************************************************************************************************************
@@ -246,6 +227,68 @@ export class GranularComponent implements OnInit {
       choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
       data: this.data,
     }
-    this.dataReqService.updateChartData(sendingData);
+    this.barChartService.updateChartData(sendingData);
+  }
+
+  /**********************************************************************************************************************************
+ * 
+ *  Resolve Chart Parameters 
+ * 
+ **********************************************************************************************************************************/
+
+  resolveChartParameter(parameterNumber: number) {
+    if (parameterNumber == 1) {
+      this.dataURL = {
+        Annual: "getAlcoholDataAllDistAnnually",
+        Quarter: "getAlcoholDataAllDistQuart",
+        Monthly: "getAlcoholDataAllDistMonthly"
+      }
+      return {
+        yLabel: "Alcohol Cases",
+        data: "getAlcoholDataAllDist",
+        threshold: 3000,
+        columnName: "AlcoholCases"
+      }
+    }
+    else if (parameterNumber == 2) {
+      console.log("getting urls")
+      this.dataURL = {
+        Annual: "getSuicideDataAllDistAnnually",
+        Quarter: "getSuicideDataAllDistQuart",
+        Monthly: "getSuicideDataAllDistMonthly"
+      }
+      return {
+        yLabel: "Suicide Cases",
+        data: "getSuicideDataAllDist",
+        threshold: 3000,
+        columnName: "SuicideCases" 
+      }
+    }
+  }
+
+  /* *****************************************************************************************************************************
+   *  Process Data requests
+   * 
+   * ****************************************************************************************************************************/
+
+  processDataRequest(newDataReq) {
+    console.log("District granualar : Data req received")
+    console.log(newDataReq)
+    // Update chart parameters
+    this.chartParameters = this.resolveChartParameter(newDataReq.parameterNumber);
+    this.barChartService.updateParameters(this.chartParameters);
+    
+    if (!newDataReq.onSubmit) {
+      this.year = newDataReq.year;
+      this.granularChoosen = newDataReq.granular;
+      if (newDataReq.granular == 2)
+        this.monthChoosen = newDataReq.choosenValue;
+      else if (newDataReq.granular == 3)
+        this.quarterChoosen = newDataReq.choosenValue;
+    }
+    this.getYearData(this.year);
   }
 }
+
+
+

@@ -24,6 +24,8 @@ import { BarChartStateComponent } from './StateView/bar-chart-state/bar-chart-st
 import { StateViewMenuComponent } from './StateView/state-view-menu/state-view-menu.component';
 import { StateViewGranularComponent } from './StateView/state-view-granular/state-view-granular.component';
 import { BarChartStateService } from './services/bar-chart-state.service';
+import { AreaChartPerDistComponent } from './PerDist/area-chart-per-dist/area-chart-per-dist.component';
+import { AreaChartPerDistService } from './services/areaChartPerDist.service';
 
 
 @NgModule({
@@ -40,6 +42,7 @@ import { BarChartStateService } from './services/bar-chart-state.service';
     BarChartStateComponent,
     StateViewMenuComponent,
     StateViewGranularComponent,
+    AreaChartPerDistComponent,
   ],
   imports: [
     BrowserModule,
@@ -61,6 +64,7 @@ import { BarChartStateService } from './services/bar-chart-state.service';
               LineChartPerDistService,
               BarChartStateService,
               Title,
+              AreaChartPerDistService
             ],
   bootstrap: [AppComponent]
 })
