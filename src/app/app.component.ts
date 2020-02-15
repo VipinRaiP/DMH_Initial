@@ -11,7 +11,7 @@ export class AppComponent {
   title = 'AngularInit';
 
   constructor(private router:Router){
-
+    /* test comment */
   }
 
   onClick(parameterType){
