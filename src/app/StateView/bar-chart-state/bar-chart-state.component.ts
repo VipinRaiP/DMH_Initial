@@ -296,8 +296,8 @@ export class BarChartStateComponent implements OnInit {
         onSubmit:false
       }
       allDistService_copy.createDataReq(parameter);
+      location.href = "#District"
     }
-
   }
 
   /* Year chaange event Handler */

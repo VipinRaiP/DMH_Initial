@@ -10,7 +10,8 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { FormControl } from '@angular/forms';
 import { LineChartPerDistService } from 'src/app/services/lineChartPerDist.service';
 import { AreaChartPerDistService } from 'src/app/services/areaChartPerDist.service';
-
+import { LineChartPerDistDataReq } from 'src/app/model/linechartPerDistParameters.model';
+import { LineChartPerDistParameters } from 'src/app/model/linechartPerDistParameters.model';
 
 const moment = _rollupMoment || _moment; _moment;
 
@@ -50,28 +51,155 @@ export class GranularPerDistComponent implements OnInit {
   @Output()
   private yearChange = new EventEmitter<any>();
 
-  private year: number;
+  private year: number = 2018;
+  private yearObj = new FormControl(moment());
+  private data: any;
+  private dataURL: any = "getAlcoholDataPerDist";
+  private districtId: number = 1;
+  private districtName: number;
+  private timeFieldName: string = 'ReportingMonthyear';
+  private parameterNumber:number = 1;
 
-  ngOnInit(): void {
-    throw new Error("Method not implemented.");
+  constructor(private http: HttpClient, private linechartPerDistService: LineChartPerDistService) {
+
   }
 
-  /* On year change */
+  ngOnInit(): void {
 
-  private yearObj = new FormControl(moment());
+    let postData = {
+      districtId: this.districtId
+    }
 
-  choosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
-    console.log("year called : " + normalizedYear.year())
-    //this.radioPresent=!this.radioPresent;
+    this.http.post<any>("http://localhost:3000/" + this.dataURL, postData)
+      .subscribe(responseData => {
+        console.log("Line chart : Data received from backend");
+        console.log(responseData)
+        this.data = responseData;
+        this.districtName = this.data[0]['District'];
+        let newDataReq = this.linechartPerDistService.getDataReq();
+        this.processDataReq(newDataReq);
+        this.linechartPerDistService.getDataReqListener().subscribe((newDataReq) => {
+          console.log("Line chart granular : Data req received")
+          this.processDataReq(newDataReq);
+        })
+      })
+  }
+
+  /* ***************************************************************************************************************************
+   * On year change
+   * 
+   * ***************************************************************************************************************************/
+
+  onYearChangeHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
+    console.log("Line chart granular : year called : " + normalizedYear.year())
     const ctrlValue = this.yearObj.value;
     ctrlValue.year(normalizedYear.year());
     this.yearObj.setValue(ctrlValue);
     datepicker.close();
     this.year = normalizedYear.year();
-    this.yearChange.emit(this.year);
+    this.updateData(this.year);
   }
 
-  /****************************** */
+  /* ***************************************************************************************************************************
+   *  Process data request 
+   * 
+   * ***************************************************************************************************************************/
+
+  processDataReq(newDataReq: LineChartPerDistDataReq) {
+    let chartParameter: LineChartPerDistParameters = this.resolveChartParameters(newDataReq.districtId, newDataReq.parameterNumber);
+    //update line chart parameter
+    this.linechartPerDistService.updateParameters(chartParameter);
+    if (!newDataReq.onSubmit)
+      this.year = newDataReq.year;
+    if ((newDataReq.districtId != this.districtId) || (this.parameterNumber!=newDataReq.parameterNumber)) {
+      this.getData(newDataReq.districtId);
+      this.districtId = newDataReq.districtId;
+      this.parameterNumber = newDataReq.parameterNumber;
+    }
+    else
+      this.updateData(this.year);
+
+  }
+
+  /* ***************************************************************************************************************************
+   * Resolve chart parameters on parameter and district Id change
+   * 
+   * ***************************************************************************************************************************/
+
+  resolveChartParameters(districtId, parameterNumber) {
+    if (parameterNumber == 1) {
+      this.dataURL = "getAlcoholDataPerDist";
+      return {
+        yLabel: "Alcohol Cases",
+        threshold: 30,
+        yColumnName: "AlcoholCases",
+      }
+    }
+    if (parameterNumber == 2) {
+      this.dataURL = "getSuicideDataPerDist"
+      return {
+        yLabel: "Suicide Cases",
+        threshold: 6,
+        yColumnName: "SuicideCases",
+      }
+    }
+  }
+
+  /* ***************************************************************************************************************************
+   *  Get data for a district 
+   * 
+   * ***************************************************************************************************************************/
+
+  getData(districtId) {
+    let postData = {
+      districtId: districtId
+    }
+
+    this.http.post<any>("http://localhost:3000/" + this.dataURL, postData)
+      .subscribe(responseData => {
+        console.log("Line chart : Data received from backend");
+        console.log(responseData)
+        this.data = responseData;
+        this.districtName = this.data[0]['District'];
+        this.updateData(this.year);
+      })
+  }
+
+  /* ***************************************************************************************************************************
+   *  Update chart data on year change
+   * 
+   * ***************************************************************************************************************************/
+
+  updateData(year) {
+    let newData = this.data.filter(d => {
+      console.log(new Date(d[this.timeFieldName]).getFullYear())
+      return (
+        new Date(d[this.timeFieldName]).getFullYear() == year
+      );
+    });
+    newData  = this.dataPreprocessing(newData);
+    console.log("Line chart granular: filtered data");
+    console.log(newData);
+    let sendingData = {
+      data: newData,
+      districtId: this.districtId,
+      districtName: this.districtName,
+      year: year,
+      xColumnName: this.timeFieldName
+    }
+    this.linechartPerDistService.updateChartData(sendingData);
+  }
+
+  dataPreprocessing(filterData) {
+    /*  Pre processing */
+    this.data.forEach(d => {
+      d[this.timeFieldName] = new Date(d[this.timeFieldName]).getTime();
+    })
+    return filterData;
+  }
+
+
+  /***************************************************************************************************************************** */
   /*
     private minYear: number = 2017;
     private maxYear: number = new Date().getFullYear();

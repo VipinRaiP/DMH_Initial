@@ -49,7 +49,7 @@ export const MY_FORMATS = {
 })
 export class GranularComponent implements OnInit {
 
-  private year: number = new Date().getFullYear();
+  private year: number = 2018;
   private quarterData: any;
   private monthlyData: any;
   private annualData: any;
@@ -60,7 +60,7 @@ export class GranularComponent implements OnInit {
   private displayMonthData = false;
   private displayQuarterData = false;
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
-  private parameter: string;
+  private parameterName: string;
   private chartParameters: BarChartAllDistParameters;
 
   @Input()
@@ -75,15 +75,15 @@ export class GranularComponent implements OnInit {
 
   ngOnInit() {
     console.log("All dist Granular loaded");
-    let newDataReq:BarChartAllDistDataReq;
-    newDataReq  = this.barChartService.getDataReq();
+    let newDataReq: BarChartAllDistDataReq;
+    newDataReq = this.barChartService.getDataReq();
     this.processDataRequest(newDataReq);
     // Subscribe for further data requests from onsubmit or drill downs
 
     this.barChartService.getDataReqListener().subscribe((newDataReq) => {
-        this.processDataRequest(newDataReq);
+      this.processDataRequest(newDataReq);
     })
-  
+
   }
 
   /* *********************************************************************************************************************
@@ -221,14 +221,24 @@ export class GranularComponent implements OnInit {
       data: this.data,
       year: this.year
     });*/
-    let sendingData = {
-      year: this.year,
-      granular: this.granularChoosen,
-      choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
-      data: this.data,
-    }
-    this.barChartService.updateChartData(sendingData);
+    this.sendDataToChart();
   }
+
+  /* ****************************************************************************************************************************
+   *  Send Data to chart
+   *
+   * ***************************************************************************************************************************/
+
+    sendDataToChart(){
+      let sendingData = {
+        year: this.year,
+        granular: this.granularChoosen,
+        choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
+        data: this.data,
+      }
+      this.barChartService.updateChartData(sendingData);
+    }
+
 
   /**********************************************************************************************************************************
  * 
@@ -237,6 +247,8 @@ export class GranularComponent implements OnInit {
  **********************************************************************************************************************************/
 
   resolveChartParameter(parameterNumber: number) {
+    this.parameterName = this.resolveParameterName(parameterNumber);
+    console.log("New parameter name : " + this.parameterName)
     if (parameterNumber == 1) {
       this.dataURL = {
         Annual: "getAlcoholDataAllDistAnnually",
@@ -245,9 +257,8 @@ export class GranularComponent implements OnInit {
       }
       return {
         yLabel: "Alcohol Cases",
-        data: "getAlcoholDataAllDist",
         threshold: 3000,
-        columnName: "AlcoholCases"
+        yColumnName: this.parameterName
       }
     }
     else if (parameterNumber == 2) {
@@ -259,9 +270,8 @@ export class GranularComponent implements OnInit {
       }
       return {
         yLabel: "Suicide Cases",
-        data: "getSuicideDataAllDist",
         threshold: 3000,
-        columnName: "SuicideCases" 
+        yColumnName: this.parameterName
       }
     }
   }
@@ -277,7 +287,7 @@ export class GranularComponent implements OnInit {
     // Update chart parameters
     this.chartParameters = this.resolveChartParameter(newDataReq.parameterNumber);
     this.barChartService.updateParameters(this.chartParameters);
-    
+
     if (!newDataReq.onSubmit) {
       this.year = newDataReq.year;
       this.granularChoosen = newDataReq.granular;
@@ -288,7 +298,60 @@ export class GranularComponent implements OnInit {
     }
     this.getYearData(this.year);
   }
+
+  /* ******************************************************************************************************************************
+   *  Resolve parameter name
+   * 
+   * *****************************************************************************************************************************/
+
+  resolveParameterName(parameterNumber) {
+    switch (+parameterNumber) {
+      case 1:
+        return 'Alcohol Cases';
+        break;
+      case 2:
+        console.log("Suicide cases case")
+        return 'Suicide Cases';
+        break;
+    }
+  }
+
+  /* ******************************************************************************************************************************
+   *  Sort By optinon
+   * 
+   * *****************************************************************************************************************************/
+
+  onSortByChange(event) {
+    let sortByChoosen = (event.target.value == "") ? 1 : event.target.value;
+    console.log("All Dist: Sort by option changed");
+    console.log(this.data);
+    if (this.data.length != 0) {
+      this.sortData(sortByChoosen);
+      this.sendDataToChart();
+    }
+  }
+
+  sortData(sortByChoosen) {
+    let sortAttributeName;
+    switch (+sortByChoosen) {
+      case 1:
+        sortAttributeName = this.parameterName;
+        break;
+      case 2:
+        sortAttributeName = 'District';
+        break;
+    }
+    this.data.sort(function(a, b){
+      return a[sortAttributeName] < b[sortAttributeName]? -1: a[sortAttributeName]>b[sortAttributeName]?1:0;
+    })
+    console.log(this.data)
+  }
+
+
+
+
 }
+
 
 
 

@@ -204,7 +204,7 @@ export class BarChartAllDistComponent implements OnInit {
     console.log("Data to chart")
     console.log(this.data);
     let xValue = 'District';
-    let yValue = this.chartParameters.columnName;
+    let yValue = this.chartParameters.yColumnName;
 
     this.legendGroup_1.text("Less than " + this.chartParameters.threshold);
     this.legendGroup_2.text("More than " + this.chartParameters.threshold);
@@ -284,7 +284,7 @@ export class BarChartAllDistComponent implements OnInit {
 
     /* Bar chart on click naviagate to Per disrct line chart */
 
-    let xScale_copy = this.xScale;
+/*    let xScale_copy = this.xScale;
     let columnName_copy = this.chartParameters.columnName;
     let linechartPerDistService_copy = this.linechartPerDistService;
     let router_copy = this.router;
@@ -298,9 +298,9 @@ export class BarChartAllDistComponent implements OnInit {
       linechartPerDistService_copy.updateParameters(linechartParameters);
       router_copy.navigate(["perDistView",actualData.DistrictId]);
     }
-
+*/
     /* Resolve parameters */
-    let year_copy = this.year;
+/*    let year_copy = this.year;
     function resolvePerDistParameter(districtId, parameter, district) {
       if (parameter == "AlcoholCases") {
         return {
@@ -324,7 +324,7 @@ export class BarChartAllDistComponent implements OnInit {
           year: year_copy
         }
       }
-    }
+    }*/
   }
 }
 

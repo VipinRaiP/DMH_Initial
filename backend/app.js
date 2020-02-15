@@ -108,7 +108,7 @@ con.connect(function (err) {
   console.log("connected");
 });
 
-sql = "use Clinical_data";
+sql = "use DMH";
 con.query(sql, function (err, res) {
   if (err) console.log(err);
   console.log(res);
@@ -117,7 +117,7 @@ con.query(sql, function (err, res) {
 /*
 app.get("/alcoholDataAllDist", function(req, res) {
   sql =
-    "select DistrictId,(count(old_alcohal_female)+count(old_alcohal_male)+count(new_alcohal_female)+count(new_alcohal_male)) as AlcoholCases from mytable group by DistrictId;";
+    "select DistrictId,(count(old_alcohal_female)+count(old_alcohal_male)+count(new_alcohal_female)+count(new_alcohal_male)) as AlcoholCases from Clinical_Data group by DistrictId;";
 
   con.query(sql, function(err, response) {
     if (err) console.log(err);
@@ -127,7 +127,7 @@ app.get("/alcoholDataAllDist", function(req, res) {
 
 app.get("/suicideDataAllDist", function(req, res) {
     sql =
-    "select DistrictId,(count(old_male_suicidecases)+count(old_female_suicidecases)+count(new_female_suicidecases)+count(new_male_suicidecases)) as SuicideCases from mytable group by DistrictId;"
+    "select DistrictId,(count(old_male_suicidecases)+count(old_female_suicidecases)+count(new_female_suicidecases)+count(new_male_suicidecases)) as SuicideCases from Clinical_Data group by DistrictId;"
   
     con.query(sql, function(err, response) {
       if (err) console.log(err);
@@ -143,7 +143,7 @@ app.post("/getAlcoholDataAllDist", function (req, res) {
   console.log(fromDate);
   sql = "select m.DistrictId,d.District,\
         (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases\
-        from mytable m,Districts d\
+        from Clinical_Data m,Districts d\
         where m.DistrictId=d.DistrictId and ReportingDate >='" + fromDate + "' and ReportingDate <='" + toDate + "' \
         group by m.DistrictId \
         Order By AlcoholCases"
@@ -164,7 +164,7 @@ app.post("/getSuicideDataAllDist", function (req, res) {
   console.log("no");
   sql = "select m.DistrictId,d.District,\
         (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)+sum(new_male_suicidecases)) as SuicideCases\
-        from mytable m,Districts d\
+        from Clinical_Data m,Districts d\
         where m.DistrictId=d.DistrictId and ReportingDate >='" + fromDate + "' and ReportingDate <='" + toDate + "' \
         group by d.DistrictId \
         Order By SuicideCases"
@@ -182,7 +182,7 @@ app.post("/getAlcoholDataPerDist", function (req, res) {
   console.log(req.body)
   sql = "select d.District,m.ReportingMonthyear,\
         (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases\
-        from mytable m,Districts d where m.DistrictId=? and m.DistrictId=d.DistrictId\
+        from Clinical_Data m,Districts d where m.DistrictId=? and m.DistrictId=d.DistrictId\
         group by ReportingMonthyear"
   console.log(sql)
   con.query(sql, [districtId], function (err, response) {
@@ -197,7 +197,7 @@ app.post("/getSuicideDataPerDist", function (req, res) {
 
   sql = "select d.District,m.ReportingMonthyear,\
         (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_male_suicidecases)+sum(new_male_suicidecases)) as SuicideCases \
-        from mytable m,Districts d \
+        from Clinical_Data m,Districts d \
         where m.DistrictId=? and m.DistrictId=d.DistrictId \
         group by ReportingMonthyear"
 
@@ -228,7 +228,7 @@ app.post("/getAlcoholDataAllDistMonthly", (req, res) => {
   var year = req.body.year;
 
   sql = "select m.Month,m.DistrictId, d.District,\
-    (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases\
+    (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as `Alcohol Cases`\
     from (SELECT CASE \
     WHEN MONTH(ReportingMonthyear)=1 THEN 1 \
     WHEN MONTH(ReportingMonthyear)=2 THEN 2 \
@@ -243,11 +243,11 @@ app.post("/getAlcoholDataAllDistMonthly", (req, res) => {
     WHEN MONTH(ReportingMonthyear)=11 THEN 11 \
     WHEN MONTH(ReportingMonthyear)=12  THEN 12 \
     END as Month,DistrictId,new_alcohal_male,old_alcohal_male,new_alcohal_female,old_alcohal_female \
-    from mytable \
+    from Clinical_Data \
     where year(ReportingMonthyear)=?) m, Districts d \
     where m.DistrictId = d.DistrictId \
     group by m.Month,m.DistrictId \
-    order by Month,AlcoholCases";
+    order by Month,`Alcohol Cases`";
 
   con.query(sql, [year], function (err, response) {
     if (err) console.log(err);
@@ -265,7 +265,7 @@ app.post("/getSuicideDataAllDistMonthly", (req, res) => {
   var year = req.body.year;
   console.log(year);
   sql = "select m.Month,d.DistrictId,d.District,\
-        (sum(old_male_suicidecases)+sum(new_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)) as SuicideCases\
+        (sum(old_male_suicidecases)+sum(new_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)) as `Suicide Cases`\
         from (SELECT CASE WHEN MONTH(ReportingMonthyear)=1 THEN 1 \
         WHEN MONTH(ReportingMonthyear)=2 THEN 2 \
         WHEN MONTH(ReportingMonthyear)=3  THEN 3 \
@@ -279,11 +279,11 @@ app.post("/getSuicideDataAllDistMonthly", (req, res) => {
         WHEN MONTH(ReportingMonthyear)=11 THEN 11 \
         WHEN MONTH(ReportingMonthyear)=12  THEN 12 \
         END as Month,DistrictId,old_male_suicidecases,new_male_suicidecases,old_female_suicidecases,new_female_suicidecases \
-        from mytable \
+        from Clinical_Data \
         where year(ReportingMonthyear)=? ) m, Districts d \
         where m.DistrictId = d.DistrictId \
         group by m.Month,d.DistrictId \
-        order by m.Month,SuicideCases";
+        order by m.Month,`Suicide Cases`";
 
 
   con.query(sql, [year], function (err, response) {
@@ -297,7 +297,7 @@ app.post("/getSuicideDataAllDistMonthly", (req, res) => {
 app.post("/getAlcoholDataAllDistQuart", (req, res) => {
   var year = req.body.year;
   sql = "select q.Quarter,q.DistrictId,d.District,\
-        (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases \
+        (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as `Alcohol Cases` \
          from (SELECT CASE \
               WHEN MONTH(ReportingMonthYear)>=1 and MONTH(ReportingMonthYear)<=3 THEN 1 \
               WHEN MONTH(ReportingMonthYear)>=4 and MONTH(ReportingMonthYear)<=6 THEN 2 \
@@ -305,11 +305,11 @@ app.post("/getAlcoholDataAllDistQuart", (req, res) => {
               WHEN MONTH(ReportingMonthYear)>=10 and MONTH(ReportingMonthYear)<=12 THEN 4 \
               END as Quarter,DistrictId,new_alcohal_male,old_alcohal_male,new_alcohal_female,\
               old_alcohal_female \
-              from mytable \
+              from Clinical_Data \
               where year(ReportingMonthyear)=?) q , Districts d\
               where q.DistrictId = d.DistrictId \
               group by q.Quarter,q.DistrictId\
-              order by q.Quarter,AlcoholCases";
+              order by q.Quarter,`Alcohol Cases`";
 
   con.query(sql, [year], function (err, response) {
     if (err) console.log(err);
@@ -323,16 +323,16 @@ app.post("/getSuicideDataAllDistQuart", (req, res) => {
   var year = req.body.year;
   console.log(year);
   sql = "select q.Quarter,d.DistrictId,d.District,\
-        (sum(old_male_suicidecases)+sum(new_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)) as SuicideCases\
+        (sum(old_male_suicidecases)+sum(new_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)) as `Suicide Cases`\
         from (SELECT CASE WHEN MONTH(ReportingMonthYear)>=1 and MONTH(ReportingMonthYear)<=3 THEN 1  \
         WHEN MONTH(ReportingMonthYear)>=4 and MONTH(ReportingMonthYear)<=6 THEN 2 \
         WHEN MONTH(ReportingMonthYear)>=7 and MONTH(ReportingMonthYear)<=9 THEN 3 \
         WHEN MONTH(ReportingMonthYear)>=10 and MONTH(ReportingMonthYear)<=12 THEN 4 \
         END as Quarter,DistrictId,old_male_suicidecases,new_male_suicidecases,old_female_suicidecases,new_female_suicidecases\
-        from mytable where year(ReportingMonthyear)=?) q,Districts d \
+        from Clinical_Data where year(ReportingMonthyear)=?) q,Districts d \
         where q.DistrictId = d.DistrictId  \
         group by q.Quarter,d.DistrictId \
-        order by q.Quarter,SuicideCases;";
+        order by q.Quarter,`Suicide Cases`";
 
   con.query(sql, [year], function (err, response) {
     if (err) console.log(err);
@@ -346,11 +346,11 @@ app.post("/getAlcoholDataAllDistAnnually", (req, res) => {
   var year = req.body.year;
   console.log(year)
   sql = "select m.DistrictId, d.District,\
-        (sum(old_alcohal_male)+sum(new_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)) as AlcoholCases\
-        from mytable m,Districts d\
+        (sum(old_alcohal_male)+sum(new_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)) as `Alcohol Cases`\
+        from Clinical_Data m,Districts d\
         where year(ReportingMonthyear)=? and m.DistrictId = d.DistrictId\
         group by m.DistrictId \
-        order by AlcoholCases";
+        order by `Alcohol Cases`";
 
   con.query(sql, [year], function (err, response) {
     console.log(sql)
@@ -363,11 +363,11 @@ app.post("/getAlcoholDataAllDistAnnually", (req, res) => {
 app.post("/getSuicideDataAllDistAnnually", (req, res) => {
   var year = req.body.year;
   sql = "select d.DistrictId,d.District,\
-        (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_male_suicidecases)+sum(new_male_suicidecases)) as SuicideCases \
-        from mytable m, Districts d \
+        (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_male_suicidecases)+sum(new_male_suicidecases)) as `Suicide Cases` \
+        from Clinical_Data m, Districts d \
         where year(ReportingMonthyear)=? and m.DistrictId=d.DistrictId\
         group by m.DistrictId \
-        order by SuicideCases";
+        order by `Suicide Cases`";
   con.query(sql, [year], function (err, response) {
     if (err) console.log(err);
     console.log(response);
@@ -400,7 +400,7 @@ app.get("/getStateAlcoholDataMonthly", (req, res) => {
           WHEN MONTH(ReportingMonthyear)=11 THEN 11 \
           WHEN MONTH(ReportingMonthYear)=12  THEN 12 \
           END as Month,year(ReportingMonthyear) as Year,old_alcohal_male,new_alcohal_male,new_alcohal_female,old_alcohal_female \
-          from mytable) m \
+          from Clinical_Data) m \
           group by Year,Month\
           order by Year,Month"
 
@@ -417,7 +417,6 @@ app.get("/getStateAlcoholDataMonthly", (req, res) => {
     }*/
     res.json(responseGrouped);
   });
-
 })
 
 app.get("/getStateAlcoholDataYearly", (req, res) => {
@@ -425,7 +424,7 @@ app.get("/getStateAlcoholDataYearly", (req, res) => {
   sql = "select m.Year, \
           (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases \
           from (SELECT year(ReportingMonthyear) as Year,old_alcohal_male,new_alcohal_male,new_alcohal_female,old_alcohal_female \
-          from mytable) m  \
+          from Clinical_Data) m  \
           group by m.Year \
           order by m.Year"
 
@@ -447,7 +446,7 @@ app.get("/getStateAlcoholDataQuart", (req, res) => {
         WHEN MONTH(ReportingMonthyear)>=10 and MONTH(ReportingMonthyear)<=12 THEN 4 \
         END as Quarter,year(ReportingMonthyear) as Year,new_alcohal_male,old_alcohal_male,new_alcohal_female,\
         old_alcohal_female \
-        from mytable) q \
+        from Clinical_Data) q \
         group by q.Year,q.Quarter \
         order by q.Year,q.Quarter";
 
@@ -480,7 +479,7 @@ app.get("/getStateSuicideDataMonthly", (req, res) => {
           WHEN MONTH(ReportingMonthyear)=11 THEN 11 \
           WHEN MONTH(ReportingMonthYear)=12  THEN 12 \
           END as Month,year(ReportingMonthyear) as Year,old_male_suicidecases,new_male_suicidecases,new_female_suicidecases,old_female_suicidecases \
-          from mytable) m \
+          from Clinical_Data) m \
           group by m.Year,m.Month \
           order by m.Year,m.Month"
 
@@ -498,7 +497,7 @@ app.get("/getStateSuicideDataYearly", (req, res) => {
   sql = "select m.Year, \
           (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)+sum(new_male_suicidecases)) as SuicideCases \
           from (SELECT year(ReportingMonthyear) as Year,old_male_suicidecases,new_male_suicidecases,new_female_suicidecases,old_female_suicidecases \
-          from mytable) m  \
+          from Clinical_Data) m  \
           group by m.Year \
           order by m.Year"
 
@@ -519,7 +518,7 @@ app.get("/getStateSuicideDataQuart", (req, res) => {
         WHEN MONTH(ReportingMonthyear)>=7 and MONTH(ReportingMonthyear)<=9 THEN 3 \
         WHEN MONTH(ReportingMonthyear)>=10 and MONTH(ReportingMonthyear)<=12 THEN 4 \
         END as Quarter,year(ReportingMonthyear) as Year,new_male_suicidecases,old_male_suicidecases,new_female_suicidecases,old_female_suicidecases \
-        from mytable) q \
+        from Clinical_Data) q \
         group by q.Year,q.Quarter \
         order by q.Year,q.Quarter";
 
@@ -556,7 +555,7 @@ app.post("/getPerDistAlcoholDataMonthly", (req, res) => {
           WHEN MONTH(ReportingMonthyear)=11 THEN 11 \
           WHEN MONTH(ReportingMonthYear)=12  THEN 12 \
           END as Month,year(ReportingMonthyear) as Year,old_alcohal_male,new_alcohal_male,new_alcohal_female,old_alcohal_female \
-          from mytable \
+          from Clinical_Data \
           where districtId=?) m \
           group by Year,Month\
           order by Year,Month"
@@ -582,7 +581,7 @@ app.post("/getPerDistAlcoholDataYearly", (req, res) => {
   sql = "select m.Year, \
           (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases \
           from (SELECT year(ReportingMonthyear) as Year,old_alcohal_male,new_alcohal_male,new_alcohal_female,old_alcohal_female \
-          from mytable \
+          from Clinical_Data \
           where districtId = ?) m  \
           group by m.Year \
           order by m.Year"
@@ -604,7 +603,7 @@ app.post("/getPerDistAlcoholDataQuart", (req, res) => {
         WHEN MONTH(ReportingMonthyear)>=9 and MONTH(ReportingMonthyear)<=12 THEN 3 \
         END as Quarter,year(ReportingMonthyear) as Year,new_alcohal_male,old_alcohal_male,new_alcohal_female,\
         old_alcohal_female \
-        from mytable \
+        from Clinical_Data \
         where districtId = ?) q \
         group by q.Year,q.Quarter \
         order by q.Year,q.Quarter";
@@ -638,7 +637,7 @@ app.post("/getPerDistSuicideDataMonthly", (req, res) => {
           WHEN MONTH(ReportingMonthyear)=11 THEN 11 \
           WHEN MONTH(ReportingMonthYear)=12  THEN 12 \
           END as Month,year(ReportingMonthyear) as Year,old_male_suicidecases,new_male_suicidecases,new_female_suicidecases,old_female_suicidecases \
-          from mytable \
+          from Clinical_Data \
           where districtId = ?) m \
           group by m.Year,m.Month \
           order by m.Year,m.Month"
@@ -657,7 +656,7 @@ app.post("/getPerDistSuicideDataYearly", (req, res) => {
   sql = "select m.Year, \
           (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)+sum(new_male_suicidecases)) as SuicideCases \
           from (SELECT year(ReportingMonthyear) as Year,old_male_suicidecases,new_male_suicidecases,new_female_suicidecases,old_female_suicidecases \
-          from mytable \
+          from Clinical_Data \
           where districtId = ?) m  \
           group by m.Year \
           order by m.Year"
@@ -678,7 +677,7 @@ app.post("/getPerDistSuicideDataQuart", (req, res) => {
         WHEN MONTH(ReportingMonthyear)>=5 and MONTH(ReportingMonthyear)<=8 THEN 2 \
         WHEN MONTH(ReportingMonthyear)>=9 and MONTH(ReportingMonthyear)<=12 THEN 3 \
         END as Quarter,year(ReportingMonthyear) as Year,new_male_suicidecases,old_male_suicidecases,new_female_suicidecases,old_female_suicidecases \
-        from mytable \
+        from Clinical_Data \
         where districtId = ?) q \
         group by q.Year,q.Quarter \
         order by q.Year,q.Quarter";

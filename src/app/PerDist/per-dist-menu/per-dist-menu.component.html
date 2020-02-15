@@ -3,17 +3,15 @@
         <div class="row">
             <div class="col-md-2 form-group">
                 <select ngModel class="form-control" name="districtId">
-                    <option value="" selected disabled>Select District Id</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
+                    <option selected value="">1</option>
+                    <option value=2>2</option>
+                    <option value=3>3</option>
                 </select>
             </div>
             <div class="col-md-2 form-group">
                 <select ngModel class="form-control" name="parameter">
-                    <option value="" selected disabled>Select Parameter</option>
-                    <option value="alcoholCases">Alcohol Cases</option>
-                    <option value="suicideCases">Suicide Cases</option>
+                    <option selected value="">Alcohol Cases</option>
+                    <option value=2>Suicide Cases</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -25,12 +23,5 @@
         </div>
     </form>
 
-    <!--app-line-chart-per-dist *ngIf="0==paramNumber"></app-line-chart-per-dist>
-    <app-line-chart-per-dist *ngIf="1==paramNumber"></app-line-chart-per-dist>
-    <app-line-chart-per-dist *ngIf="2==paramNumber"></app-line-chart-per-dist>
-    <app-line-chart-per-dist *ngIf="3==paramNumber"></app-line-chart-per-dist-->
-    <div *ngFor="let dId of distId">
-        <app-line-chart-per-dist *ngIf="dId==choosenDistrictId"></app-line-chart-per-dist>
-        <!--app-area-chart-per-dist *ngIf="dId==choosenDistrictId"></app-area-chart-per-dist-->    
-    </div>
+    <app-line-chart-per-dist></app-line-chart-per-dist>
 </div>

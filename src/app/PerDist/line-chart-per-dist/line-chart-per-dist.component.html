@@ -31,17 +31,20 @@
       </div>
     </div-->
   <div class="row">
-    <app-granular-per-dist (yearChange)="onYearChange($event)"></app-granular-per-dist>
+    <app-granular-per-dist></app-granular-per-dist>
   </div>
   <div class="row">
     <div class="col-md-4">
       <label for="Year Choosen">Year : {{year}}</label>
     </div>
     <div class="col-md-4">
-      <label for="District choosen">District : {{district}}</label>
+      <label for="District choosen">District : {{districtName}}</label>
     </div>
-    <div class="col-md-4">
+    <!--div class="col-md-4">
       <button class="btn btn-primary">Get Taluk View</button>
+    </div-->
+    <div class="col-md-4">
+      <label *ngIf="noDataDisplay==true" for="No data">No data found</label>
     </div>
   </div>
   <div class="row">
