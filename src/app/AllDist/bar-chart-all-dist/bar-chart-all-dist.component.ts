@@ -92,72 +92,30 @@ export class BarChartAllDistComponent implements OnInit {
   choosenValue: any;
   granular: number;
 
+  private legendGroup_1:any;
+  private legendGroup_2:any;
+
   constructor(private elementRef: ElementRef, private http: HttpClient, private barChartService: BarChartAllDistService, private titleService: Title,
     private linechartPerDistService: LineChartPerDistService, private router: Router) { }
 
   ngOnInit() {
-
-    /*this.data = [
-      { DistrictId: 41, AlcoholCases: 241 },
-      { DistrictId: 16, AlcoholCases: 290 },
-      { DistrictId: 25, AlcoholCases: 462 },
-      { DistrictId: 38, AlcoholCases: 512 },
-      { DistrictId: 33, AlcoholCases: 519 },
-      { DistrictId: 1, AlcoholCases: 531 },
-      { DistrictId: 20, AlcoholCases: 701 },
-      { DistrictId: 30, AlcoholCases: 1183 },
-      { DistrictId: 31, AlcoholCases: 1184 },
-      { DistrictId: 27, AlcoholCases: 1200 },
-      { DistrictId: 42, AlcoholCases: 1222 },
-      { DistrictId: 17, AlcoholCases: 1402 },
-      { DistrictId: 19, AlcoholCases: 1498 },
-      { DistrictId: 44, AlcoholCases: 1566 },
-      { DistrictId: 32, AlcoholCases: 1574 },
-      { DistrictId: 39, AlcoholCases: 1575 },
-      { DistrictId: 2,  AlcoholCases: 1603 },
-      { DistrictId: 43, AlcoholCases: 1902 },
-      { DistrictId: 3, AlcoholCases: 2204 },
-      { DistrictId: 23, AlcoholCases: 2235 },
-      { DistrictId: 35, AlcoholCases: 2783 },
-      { DistrictId: 28, AlcoholCases: 3352 },
-      { DistrictId: 29, AlcoholCases: 3424 },
-      { DistrictId: 34, AlcoholCases: 3483 },
-      { DistrictId: 12, AlcoholCases: 3689 },
-      { DistrictId: 21, AlcoholCases: 4602 },
-      { DistrictId: 13, AlcoholCases: 6858 },
-      { DistrictId: 45, AlcoholCases: 10049 },
-      { DistrictId: 15, AlcoholCases: 18280 },
-      { DistrictId: 18, AlcoholCases: 20020 },
-      { DistrictId: 37, AlcoholCases: 28236 }
-    ];*/
-    console.log("Getting barchart.............");
-    /* this.barChartService.getParametersUpdateListener().subscribe( (barCharParams:BarChartAllDistParameters)=>{
-         console.log(this.chartParameters);
-         this.chartParameters = this.chartParameters;
-     })*/
-    this.chartParameters = this.barChartService.getParameters();
-    console.log(this.chartParameters);
-   /* if (this.chartParameters != null) {
-      console.log("is not null");
-      localStorage.setItem("chartParameters", JSON.stringify(this.chartParameters));
-    }
-    else {
-      this.chartParameters = JSON.parse(localStorage.getItem("chartParameters"));
-      console.log("Parsed" + this.chartParameters);
-    }*/
-    this.titleService.setTitle(this.chartParameters.yLabel);
-    console.log(this.chartParameters);
+    console.log("Barchart All dist loaded..");
     this.createChart();
-    this.dataURL = this.chartParameters.dataURL;
-    this.updateChart();
+    this.barChartService.getParametersUpdateListener().subscribe( (newParameter)=>{
+        console.log("All dist bar chart : parameter received");
+        console.log(newParameter);
+        this.chartParameters = newParameter;
+        this.titleService.setTitle(this.chartParameters.yLabel);
+    })
 
-    this.barChartService.getChartDataListener().subscribe((d) => {
-      console.log("Barchart Data changed");
-      console.log(d);
-      this.data = d.data;
-      this.year = d.year;
-      this.granular = d.granular;
-      this.choosenValue = d.choosenValue;
+    this.barChartService.getChartDataListener().subscribe((newData) => {
+      console.log("Barchart All Dist: Data update received");
+      console.log(newData);
+      this.data = newData.data;
+      this.year = newData.year;
+      this.granular = newData.granular;
+      localStorage.setItem("granular_allDist",newData.granular+"");
+      this.choosenValue = newData.choosenValue;
       if (this.granular == 2)
         this.monthName = this.months[this.choosenValue-1];
       this.updateChart();
@@ -225,19 +183,17 @@ export class BarChartAllDistComponent implements OnInit {
       .style("fill", "red");
 
 
-    legendGroup
+    this.legendGroup_1 = legendGroup
       .append("text")
       .attr("x", 220)
       .attr("y", 130)
-      .text("Less than " + this.chartParameters.threshold)
       .style("font-size", "15px")
       .attr("alignment-baseline", "middle");
 
-    legendGroup
+      this.legendGroup_2 = legendGroup
       .append("text")
       .attr("x", 220)
       .attr("y", 160)
-      .text("More than " + this.chartParameters.threshold)
       .style("font-size", "15px")
       .attr("alignment-baseline", "middle");
   }
@@ -248,7 +204,10 @@ export class BarChartAllDistComponent implements OnInit {
     console.log("Data to chart")
     console.log(this.data);
     let xValue = 'District';
-    let yValue = this.chartParameters.columnName;
+    let yValue = this.chartParameters.yColumnName;
+
+    this.legendGroup_1.text("Less than " + this.chartParameters.threshold);
+    this.legendGroup_2.text("More than " + this.chartParameters.threshold);
 
     //.......................
 
@@ -306,7 +265,7 @@ export class BarChartAllDistComponent implements OnInit {
       .enter()
       .append('rect')
       .attr("class", "bar")
-      .on("click", drillPerDist)
+      //.on("click", drillPerDist)
       .attr('x', d => this.chartOffset + this.xScale(d[xValue]))
       .attr('y', d => this.yScale(0))
       .attr('width', this.xScale.bandwidth)
@@ -325,7 +284,7 @@ export class BarChartAllDistComponent implements OnInit {
 
     /* Bar chart on click naviagate to Per disrct line chart */
 
-    let xScale_copy = this.xScale;
+/*    let xScale_copy = this.xScale;
     let columnName_copy = this.chartParameters.columnName;
     let linechartPerDistService_copy = this.linechartPerDistService;
     let router_copy = this.router;
@@ -337,13 +296,11 @@ export class BarChartAllDistComponent implements OnInit {
       linechartParameters = resolvePerDistParameter(actualData.DistrictId, columnName_copy, actualData.District);
       console.log(linechartParameters);
       linechartPerDistService_copy.updateParameters(linechartParameters);
-      router_copy.navigate(["perDist"]);
-      //window.open("/lineChartPerDist")
-      //router_copy.navigate([]).then(result => {  window.open("lineChartPerDist?year="+this.year, '_blank'); });
+      router_copy.navigate(["perDistView",actualData.DistrictId]);
     }
-
+*/
     /* Resolve parameters */
-    let year_copy = this.year;
+/*    let year_copy = this.year;
     function resolvePerDistParameter(districtId, parameter, district) {
       if (parameter == "AlcoholCases") {
         return {
@@ -367,27 +324,7 @@ export class BarChartAllDistComponent implements OnInit {
           year: year_copy
         }
       }
-    }
+    }*/
   }
-
-  /*getData(postData) {
-    this.http.post<any>("http://localhost:3000/" + this.chartParameters.data, postData)
-      .subscribe(responseData => {
-        console.log("Data received");
-        console.log(responseData);
-        this.data = responseData;
-        this.updateChart();
-      })
-  }*/
-
-  /* Year chaange event Handler */
-
-  onYearChangeHandler(event) {
-    console.log("year change received");
-    console.log(event);
-    this.data = event.data;
-    this.year = event.year;
-    this.updateChart();
-  }
-
 }
+

@@ -5,6 +5,7 @@ import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BarChartAllDistParameters } from '../../model/barchartAllDistParameters.model';
 import { BarChartAllDistService } from '../../services/barchartAllDist.service';
+import { BarChartAllDistDataReq } from 'src/app/model/barchartAllDistDataReq.model';
 
 @Component({
   selector: 'app-all-dist-menu',
@@ -13,69 +14,39 @@ import { BarChartAllDistService } from '../../services/barchartAllDist.service';
 })
 export class AllDistMenuComponent implements OnInit, OnDestroy {
   @Input()
-  private paramNumber: number = 0;
+  private parameterNumber: number = 1;
   private params = Array(3);
   private parameterType;
 
-  constructor(private barchartService: BarChartAllDistService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private barChartService: BarChartAllDistService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
-
-    //if(localStorage.getItem('paramNumber')!=null)
-    //  this.paramNumber = +localStorage.getItem('paramNumber');
-
-    //this.barchartService.updateParameters(this.resolveParameter(this.paramNumber));
-    this.route.params.subscribe((params => {
-      console.log("Parameter Number received: "+params['paramNumber']);
-      this.paramNumber = params['paramNumber'];
-      this.barchartService.updateParameters(this.resolveParameter(this.paramNumber));
-    }))
+    console.log("All dist chart menu loaded")
+    let newDataReq:BarChartAllDistDataReq = {
+      onSubmit : true,
+      granular :1,
+      choosenValue: 2017,
+      year: 2017,
+      parameterNumber : 1
+    }
+    this.barChartService.createDataReq(newDataReq);  
   }
 
   onSubmit(form: NgForm) {
     let parameters: BarChartAllDistParameters;
-    this.parameterType = form.value.parameter;
-    console.log(this.parameterType);
-    this.paramNumber = form.value.parameter;
-    parameters = this.resolveParameter(this.paramNumber);
-    this.barchartService.updateParameters(parameters);
-  }
-
-  /* Resolve parameters */
-
-  resolveParameter(parameterNumber) {
-    if (parameterNumber == 1) {
-      console.log("parameter updating alcohol")
-      return {
-        yLabel: "Alcohol Cases",
-        data: "getAlcoholDataAllDist",
-        threshold: 3000,
-        columnName: "AlcoholCases",
-        dataURL: {
-          Annual: "getAlcoholDataAllDistAnnually",
-          Quarter: "getAlcoholDataAllDistQuart",
-          Monthly: "getAlcoholDataAllDistMonthly"
-        }
-      }
+    this.parameterNumber = (form.value.parameter=="")?1:form.value.parameter;
+    console.log("Choosen value : "+this.parameterType);
+    let newDataReq:BarChartAllDistDataReq= {
+      onSubmit : true,
+      granular :1,
+      choosenValue: 2017,
+      year: 2017,
+      parameterNumber : this.parameterNumber
     }
-    else if (parameterNumber == 2) {
-      console.log("getting urls")
-      return {
-        yLabel: "Suicide Cases",
-        data: "getSuicideDataAllDist",
-        threshold: 3000,
-        columnName: "SuicideCases",
-        dataURL: {
-          Annual: "getSuicideDataAllDistAnnually",
-          Quarter: "getSuicideDataAllDistQuart",
-          Monthly: "getSuicideDataAllDistMonthly"
-        }
-      }
-    }
+    this.barChartService.createDataReq(newDataReq);  
   }
 
   ngOnDestroy() {
-    //localStorage.setItem("paramNumber", this.paramNumber + '');
   }
 
 }

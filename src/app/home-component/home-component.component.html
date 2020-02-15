@@ -34,5 +34,29 @@
   </li>
 </ol-->
 
+<div >
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="#State">State</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#District">District</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#PerDistrict">Per District</a>
+      </li> 
+    </ul>
+  </nav>
 
-<p>DashBoard</p>
+  <div id="State" class="container-fluid bg-info" style="padding-top:50px;padding-bottom:50px">
+    <app-state-view-menu></app-state-view-menu>
+  </div>
+  <div id="District" class="container-fluid" style="padding-top:50px;padding-bottom:50px;background-color:rgb(159, 245, 202)">
+    <app-all-dist-menu></app-all-dist-menu>
+  </div>
+  <div id="PerDistrict" class="container-fluid bg-info" style="padding-top:50px;padding-bottom:50px">
+    <app-per-dist-menu></app-per-dist-menu>
+  </div>
+</div>
+

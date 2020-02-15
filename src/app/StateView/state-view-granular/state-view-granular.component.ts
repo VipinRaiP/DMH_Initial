@@ -46,39 +46,39 @@ export const MY_FORMATS = {
 export class StateViewGranularComponent implements OnInit {
   private minYear: number = 2017;
   private maxYear: number = new Date().getFullYear();
-  private year: number = this.minYear;
-  private quarterData: any;
-  private monthlyData: any;
   private annualData: any;
   private quarterChoosen: number = 1;
   private monthChoosen: number = 1;
-  private months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  private monthName = "Jan";
-  private displayMonthData = false;
-  private displayQuarterData = false;
-  private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
-  private yearData:any;
+  private monthName = "Jan"; e;
 
-  @Input()
-  dataURL: any;
+  private parameterNumber: number; // type of parameter : alcohol, suicide
+  private dataURL: {
+    Year: string,
+    Month: string,
+    Quarter: string,
+  }
+  private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
+  private year: number = this.minYear;
+  private quarterData: any;
+  private monthlyData: any;
+  private yearData: any;
+  private dataRequests: number = 0;
 
   @Output()
   data: any;
   @Output()
   granularChange = new EventEmitter<any>()
 
-  constructor(private http: HttpClient,private barChartService:BarChartStateService) { }
+  constructor(private http: HttpClient, private barChartService: BarChartStateService) { }
 
   ngOnInit() {
-    console.log("granular: ")
-    console.log("url");
-    console.log(this.dataURL);
-    this.getData();
-  }
-
-  onClick() {
-    console.log("emitted")
-    this.granularChange.emit(this.data);
+    console.log("State Granular loaded..");
+    // On new data request update chart parameters and data
+    let newDataReq = this.barChartService.getDataReq();
+    this.processDataRequests(newDataReq);
+    this.barChartService.getDataReqListener().subscribe((newDataReq) => {
+      this.processDataRequests(newDataReq);
+    })
   }
 
   /* *********************************************************************************************************************
@@ -111,20 +111,20 @@ export class StateViewGranularComponent implements OnInit {
         console.log("year Data received");
         console.log(responseData);
         this.yearData = responseData;
-    })
+      })
     this.http.get<any>("http://localhost:3000/" + this.dataURL['Month'])
       .subscribe(responseData => {
         console.log("month Data received");
         console.log(responseData);
         this.monthlyData = responseData;
-    })
+      })
     this.http.get<any>("http://localhost:3000/" + this.dataURL['Quarter'])
       .subscribe(responseData => {
         console.log("quarter  Data received");
         console.log(responseData);
         this.quarterData = responseData;
         this.updateData();
-    })
+      })
   }
 
   getMonthData() {
@@ -134,7 +134,7 @@ export class StateViewGranularComponent implements OnInit {
   }
 
   getQuarterData() {
-    return (this.quarterData[this.year] == null) ? [] : this.quarterData[this.year]; 
+    return (this.quarterData[this.year] == null) ? [] : this.quarterData[this.year];
   }
 
   /* *********************************************************************************************************************
@@ -144,7 +144,7 @@ export class StateViewGranularComponent implements OnInit {
   * *********************************************************************************************************************/
 
   updateData() {
-    console.log("Updating data")
+    console.log("State granular : Updating data")
     if (this.granularChoosen == 1) {
       /* Annual */
       this.data = this.yearData;
@@ -154,33 +154,93 @@ export class StateViewGranularComponent implements OnInit {
     else if (this.granularChoosen == 2) {
       /* Monthly */
       //console.log("Montly data for " + this.monthChoosen);
-      const month  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug',"Sep",'Oct','Nov','Dec'];
+      const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', "Sep", 'Oct', 'Nov', 'Dec'];
       console.log("Month data");
       console.log(this.monthlyData);
       this.data = JSON.parse(JSON.stringify(this.getMonthData()));
-      this.data.forEach( (d)=>{
-        d['Month'] = month[d['Month']-1];
+      this.data.forEach((d) => {
+        d['Month'] = month[d['Month'] - 1];
       })
       console.log(this.data);
     }
     else if (this.granularChoosen == 3) {
       /* Quarterly */
-      //console.log("Quarter data for " + this.quarterChoosen);
       console.log("Quarter data");
       console.log(this.quarterData);
       // to avoid copying reference 
       this.data = JSON.parse(JSON.stringify(this.getQuarterData()));
-      this.data.forEach( (d)=>{
-        d['Quarter'] = (d['Quarter']==1)?'Q1':(d['Quarter']==2)?'Q2':'Q3';
+      this.data.forEach((d) => {
+        d['Quarter'] = (d['Quarter'] == 1) ? 'Q1' : (d['Quarter'] == 2) ? 'Q2' : (d['Quarter'] == 3) ? 'Q3' : 'Q4';
       })
       console.log(this.data)
     }
-    this.granularChange.emit({
+    this.barChartService.updateChartData({
       data: this.data,
       year: this.year,
       granular: this.granularChoosen,
-      parameterNumber : this.dataURL.parameterNumber,
-      xColumnName : (this.granularChoosen==1)?"Year":(this.granularChoosen==2)?"Month":"Quarter"
+      xColumnName: (this.granularChoosen == 1) ? "Year" : (this.granularChoosen == 2) ? "Month" : "Quarter"
     });
   }
+
+  /* *****************************************************************************************************************************
+   *  Resolve state bar chart parameters
+   *  
+   * *****************************************************************************************************************************/
+
+  resolveChartParameters(paramNumber: number) {
+    if (this.parameterNumber != paramNumber)
+      this.dataRequests = 0;
+    if (paramNumber == 1) {
+      this.dataURL = {
+        Month: "getStateAlcoholDataMonthly",
+        Year: "getStateAlcoholDataYearly",
+        Quarter: "getStateAlcoholDataQuart"
+      }
+      return {
+        yLabel: "Alcohol Cases",
+        threshold: 20000,
+        yColumnName: "AlcoholCases",
+        parameterNumber: paramNumber
+      }
+    }
+    else if (paramNumber == 2) {
+      this.dataURL = {
+        Year: "getStateSuicideDataYearly",
+        Quarter: "getStateSuicideDataQuart",
+        Month: "getStateSuicideDataMonthly"
+      }
+      return {
+        yLabel: "Suicide Cases",
+        threshold: 3000,
+        yColumnName: "SuicideCases",
+        parameterNumber: paramNumber
+      }
+    }
+  }
+
+  /* *****************************************************************************************************************************
+ *  Process new data requests
+ *  
+ * *****************************************************************************************************************************/
+
+  processDataRequests(newDataReq) {
+    console.log("State granular: Processing data request " + (this.dataRequests + 1))
+    if (!newDataReq.onSubmit) {
+      this.year = newDataReq.year;
+      this.granularChoosen = newDataReq.granular;
+      if (newDataReq.granular == 2)
+        this.monthChoosen = newDataReq.choosenValue;
+      else if (newDataReq.granular == 3)
+        this.quarterChoosen = newDataReq.choosenValue;
+    }
+    let newChartParameters = this.resolveChartParameters(newDataReq.parameterNumber);
+    this.parameterNumber = newDataReq.parameterNumber;
+    this.barChartService.updateParameters(newChartParameters);
+    if (this.dataRequests == 0)
+      this.getData();
+    else
+      this.updateData();
+    this.dataRequests += 1;
+  }
+
 }

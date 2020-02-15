@@ -6,15 +6,18 @@ import { Title } from '@angular/platform-browser';
 import { LineChartPerDistParameters } from '../../model/linechartPerDistParameters.model';
 import { LineChartPerDistService } from '../../services/lineChartPerDist.service';
 import { ActivatedRoute, Params } from '@angular/router';
+import { AreaChartPerDistService } from 'src/app/services/areaChartPerDist.service';
+import { AreaChartPerDistParameters } from 'src/app/model/areaChartPerDistParameters.model';
+
 
 
 @Component({
   encapsulation: ViewEncapsulation.None,
-  selector: 'app-line-chart-per-dist',
-  templateUrl: './line-chart-per-dist.component.html',
-  styleUrls: ['./line-chart-per-dist.component.css']
+  selector: 'app-area-chart-per-dist',
+  templateUrl: './area-chart-per-dist.component.html',
+  styleUrls: ['./area-chart-per-dist.component.css']
 })
-export class LineChartPerDistComponent implements OnInit {
+export class AreaChartPerDistComponent implements OnInit {
   @ViewChild('chart', { static: true }) private chartContainer: ElementRef;
   public data: Array<any> = [];
   private margin: any = { top: 40, bottom: 20, left: 50, right: 20 };
@@ -28,49 +31,64 @@ export class LineChartPerDistComponent implements OnInit {
   private yAxis: any;
   private chartOffset: number = 30;
   private axisShortOffset: number = 100;
-  private chartParameters: LineChartPerDistParameters;
+  private chartParameters: AreaChartPerDistParameters;
   private yLabel: any;
   private xLabel: any;
   private parseTime = d3.timeParse("%Y-%m-%d");
   private formatTime = d3.timeFormat("%Y-%m-%d");
   private fromDate: any;
   private toDate: any;
-  private xColumnName: string = "ReportingMonthyear";
   private path: any;
   private line: d3.Line<[number, number]>; // this is line defination
-  private year: number;
-  private districtName: string;
-  private districtId: number;
-  private noDataDisplay : boolean = true;
+  private year:number;
+  private district:string;
 
-  constructor(private http: HttpClient, private lineChartService: LineChartPerDistService, private titleService: Title,
-    private route: ActivatedRoute) { }
+  private dataURL:any;
+  private xColumnName:string;
+  private granular:number;
+  private choosenValue:number;
+  private monthName:string;
+  private months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  private queryData:any;
+
+  constructor(private http: HttpClient, private areaChartService: AreaChartPerDistService, private titleService: Title,
+      private route:ActivatedRoute) { }
 
   ngOnInit() {
-    console.log("Per district line chart Loaded.............");
+    console.log("Getting areachart.............");
+    this.chartParameters = this.areaChartService.getParameters(); 
+    console.log(this.chartParameters);
+  
+    this.titleService.setTitle(this.chartParameters.yLabel);
+    console.log(this.chartParameters);   
     this.createChart();
-    this.lineChartService.getParametersUpdateListener().subscribe((newParameters) => {
-      console.log("Line chart : new parameter received");
-      this.chartParameters = newParameters;
-      console.log(this.chartParameters);
-      this.titleService.setTitle(this.chartParameters.yLabel);
+    this.areaChartService.getParametersUpdateListener().subscribe( (d)=>{
+      console.log("Chart parameter updated")
+      this.chartParameters = this.areaChartService.getParameters();
+      this.updateChart();
     })
 
-    this.lineChartService.getChartDataListener().subscribe((newData) => {
-      console.log("Line chart: new data received");
-      this.data = newData.data;
-      this.districtId = newData.district;
-      this.districtName = newData.districtName;
-      this.year = newData.year;
-      this.xColumnName = newData.xColumnName;
-      if(this.data.length != 0){
-        this.noDataDisplay = false;
-      }  
-      else
-        this.noDataDisplay = true;
-        this.updateChart();  
+    this.areaChartService.getChartDataListener().subscribe((d) => {
+      console.log("AreaChart Data changed");
+      console.log(d);
+      this.data = d.data;
+      this.year = d.year;
+      this.granular = d.granular;
+      this.choosenValue = d.choosenValue;
+      this.xColumnName = d.xColumnName;
+      if (this.granular == 2)
+        this.monthName = this.months[this.choosenValue-1];
+      this.updateChart();
     })
 
+    this.dataURL = this.chartParameters.dataURL;
+    this.queryData = {
+      dataURL : this.dataURL,
+      districtId : this.chartParameters.districtId
+    }
+    console.log("Query data")
+    console.log(this.queryData);
+    this.updateChart();
   }
 
   createChart() {
@@ -161,25 +179,28 @@ export class LineChartPerDistComponent implements OnInit {
 
   updateChart() {
     //this.dataPreprocessing();    
-    console.log("Line chart update called");
-    console.log(this.data);
+    console.log("update called");
+    console.log(this.year);
     var t = function () { return d3.transition().duration(1000); }
 
     let xValue = this.xColumnName;
     let yValue = this.chartParameters.yColumnName;
 
+    let dataFiltered  = this.data;
+    //.......................
+
     // define X & Y domains
     //let xDomain = this.data.map(d => this.parseTime(d[this.xColumnName]));
     console.log(this.xColumnName);
-    let xDomain = d3.extent(this.data, d => d[this.xColumnName]);
-    let yDomain = [0, d3.max(this.data, d => d[yValue])];
+    let xDomain = dataFiltered.map( (d) => d[this.xColumnName]);
+    let yDomain = [0, d3.max(dataFiltered, d => d[yValue])];
 
     console.log(yDomain)
     // create scales
-    this.xScale = d3.scaleTime().domain(xDomain).rangeRound([0, this.width - this.axisShortOffset]);
+    this.xScale = d3.scaleBand().domain(xDomain).rangeRound([0, this.width - this.axisShortOffset]);
     this.yScale = d3.scaleLinear().domain(yDomain).range([this.height - this.axisShortOffset, 0]);
     console.log(this.height)
-    console.log(this.yScale(0));
+    console.log(this.yScale(100));
 
     //...................................
 
@@ -187,8 +208,8 @@ export class LineChartPerDistComponent implements OnInit {
     //this.xScale.domain(this.data.map(d => d[xValue]));
     //this.yScale.domain([0, d3.max(this.data, d => d[yValue])]);
     //  this.colors.domain([0, this.data.length]);
-    this.xAxis.transition().call(d3.axisBottom(this.xScale)
-      .tickFormat(d3.timeFormat("%b-%Y")));
+    this.xAxis.transition().call(d3.axisBottom(this.xScale))
+    //  .tickFormat(d3.timeFormat("%b-%Y")));
     this.yAxis.transition().call(d3.axisLeft(this.yScale));
 
     // add labels
@@ -237,7 +258,7 @@ export class LineChartPerDistComponent implements OnInit {
       }
  */
     // tooltip v2
-
+/*
     var focus = this.chart.append("g")
       .attr("class", "focus")
       .style("display", "none");
@@ -245,7 +266,7 @@ export class LineChartPerDistComponent implements OnInit {
     focus.append("circle")
       .attr("r", 5);
 
-    let tooltip = focus.append("rect")
+    let tooltip  = focus.append("rect")
       .attr("class", "tooltip")
       .attr("width", 100)
       .attr("height", 50)
@@ -273,63 +294,64 @@ export class LineChartPerDistComponent implements OnInit {
       .attr("class", "overlay")
       .attr("width", this.width)
       .attr("height", this.height)
-      .on("mouseover", () => { focus.style("display", null); })
+      .on("mouseover",() => { focus.style("display", null); })
       .on("mouseout", () => { focus.style("display", "none"); })
       .on("mousemove", mousemove);
 
-    let xScale_copy = this.xScale;
-    let yScale_copy = this.yScale;
-    let bisectDate = d3.bisector((d) => { return d[this.xColumnName]; }).left;
-    let yColumnName = this.chartParameters.yColumnName;
-    let xColumnName = this.xColumnName;
-    let toolTipTime = d3.timeFormat("%d-%m-%Y");
-    let chartOffset = this.chartOffset;
-    let data_copy = this.data;  
-    function mousemove() {
-      console.log(data_copy)
-      if (data_copy.length != 0){
-        var x0 = xScale_copy.invert(d3.mouse(this)[0]),
-          i = bisectDate(data_copy, x0, 1),
-          d0 = data_copy[i - 1],
-          d1 = data_copy[i],
-          d = x0 - d0[xColumnName] > d1[xColumnName] - x0 ? d1 : d0;
-      focus.attr("transform", "translate(" + (chartOffset + xScale_copy(d[xColumnName])) + "," + yScale_copy(d[yColumnName]) + ")");
-      console.log(i);
-      if (i === 1) {
-        tooltip.attr("transform", "translate(" + (60) + "," + (-40) + ")");
-        tooltip_date.attr("transform", "translate(" + (60) + "," + (-40) + ")");
-        tooltip_label.attr("transform", "translate(" + (60) + "," + (-40) + ")");
-        tooltip_value.attr("transform", "translate(" + (60) + "," + (-40) + ")");
-      }
-      else {
-        tooltip.attr("transform", "translate(" + (-10) + "," + (20) + ")");
-        tooltip_date.attr("transform", "translate(" + (-10) + "," + (20) + ")");
-        tooltip_label.attr("transform", "translate(" + (-10) + "," + (20) + ")");
-        tooltip_value.attr("transform", "translate(" + (-10) + "," + (20) + ")");
-      }
-      focus.select(".tooltip-date").text((toolTipTime(d[xColumnName])))
-      focus.select(".tooltip-likes").text((d[yColumnName]))
-    }
-  }
+      let xScale_copy = this.xScale;
+      let yScale_copy = this.yScale;
+      let bisectDate = d3.bisector((d) => { return d[this.xColumnName]; }).left; 
+      let yColumnName = this.chartParameters.yColumnName;
+      let xColumnName = this.xColumnName;
+      let toolTipTime = d3.timeFormat("%d-%m-%Y");
+      let chartOffset = this.chartOffset;
 
+      function mousemove() {
+        console.log(dataFiltered)
+        var x0 = xScale_copy.invert(d3.mouse(this)[0]),
+          i = bisectDate(dataFiltered, x0, 1),
+          d0 = dataFiltered[i - 1],
+          d1 = dataFiltered[i],
+          d = x0 - d0[xColumnName] > d1[xColumnName] - x0 ? d1 : d0;
+          focus.attr("transform", "translate(" + (chartOffset+xScale_copy(d[xColumnName])) + "," + yScale_copy(d[yColumnName]) + ")");
+          console.log(i);
+          if(i===1){
+            tooltip.attr("transform", "translate(" + (60) + "," + (-40) + ")");
+            tooltip_date.attr("transform", "translate(" + (60) + "," + (-40) + ")");
+            tooltip_label.attr("transform", "translate(" + (60) + "," + (-40) + ")");
+            tooltip_value.attr("transform", "translate(" + (60) + "," + (-40) + ")");
+          }  
+          else{
+             tooltip.attr("transform", "translate(" + (-10) + "," + (20) + ")");
+             tooltip_date.attr("transform", "translate(" + (-10) + "," + (20) + ")");
+             tooltip_label.attr("transform", "translate(" + (-10) + "," + (20) + ")");
+             tooltip_value.attr("transform", "translate(" + (-10) + "," + (20) + ")");                              
+          }   
+        focus.select(".tooltip-date").text((toolTipTime(d[xColumnName])))
+        focus.select(".tooltip-likes").text((d[yColumnName]))
+      }
+*/
 
     // Path generator
-    let prev = null;
-this.line = d3.area()
-  .x(d => this.xScale((d[this.xColumnName])))
-  .y0(d => this.yScale(0))
-  .y1(d => {
-    prev = this.yScale(d[this.chartParameters.yColumnName]);
-    return this.yScale(d[this.chartParameters.yColumnName])
-  })
+    let prev=null;
+    this.line = d3.area()
+      .x(d => this.xScale((d[this.xColumnName])))
+      .y0(d => this.yScale(0))  
+      .y1(d => {
+        prev =  this.yScale(d[this.chartParameters.yColumnName]);
+        return this.yScale(d[this.chartParameters.yColumnName])
+      })
+      
+
+    // Update our line path
+    this.chart.select(".line")
+      .transition(t)
+      .attr("fill", "#cce5df")
+      .attr("d", this.line(dataFiltered));
 
 
-// Update our line path
-this.chart.select(".line")
-  .transition(t)
-  .attr("fill", "#cce5df")
-  .attr("d", this.line(this.data));
-
+    console.log(dataFiltered[0][this.xColumnName])
+    console.log(new Date(dataFiltered[0][this.xColumnName]).getTime())
     /*this.chart.append("path")
       .datum(dataFiltered)
       .attr("fill", "none")
@@ -342,3 +364,4 @@ this.chart.select(".line")
   }
 
 }
+

@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { LineChartPerDistService } from 'src/app/services/lineChartPerDist.service';
 import { LineChartPerDistParameters } from 'src/app/model/linechartPerDistParameters.model';
+import { AreaChartPerDistParameters } from 'src/app/model/areaChartPerDistParameters.model';
+import { AreaChartPerDistService } from 'src/app/services/areaChartPerDist.service';
+import { LineChartPerDistDataReq } from 'src/app/model/linechartPerDistParameters.model';
 
 @Component({
   selector: 'app-per-dist-menu',
@@ -11,49 +14,33 @@ import { LineChartPerDistParameters } from 'src/app/model/linechartPerDistParame
 })
 export class PerDistMenuComponent implements OnInit {
 
-  private paramNumber: number = 0;
+  private choosenDistrictId: number = 0;
+  private distId = [];
 
-  constructor(private router: Router, private linechartPerDistService: LineChartPerDistService) { }
+
+  constructor(private router: Router, private linechartPerDistService: LineChartPerDistService,
+    private route: ActivatedRoute, private areaChartPerDistService: AreaChartPerDistService) { }
 
   ngOnInit() {
+    console.log("Per dist menu loaded")
+    let newDataReq: LineChartPerDistDataReq;
+    newDataReq = {
+      onSubmit: true,
+      parameterNumber: 1,
+      districtId: 1,
+      year: 2017
+    }
+    this.linechartPerDistService.createDataReq(newDataReq);
   }
 
   onSubmit(form: NgForm) {
-    let linechartParameters: LineChartPerDistParameters;
-    console.log(+form.value.districtId);
-    linechartParameters = this.resolvePerDistParameter(+form.value.districtId, form.value.parameter);
-    this.linechartPerDistService.updateParameters(linechartParameters);
-    //this.router.navigate(["perDi"]);
-  }
-
-  /* Resolve parameters */
-
-  resolvePerDistParameter(districtId, parameter) {
-    this.paramNumber = districtId;
-    if (parameter == "alcoholCases") {
-      console.log("ParamNo : "+this.paramNumber)
-      return {
-        yLabel: "Alcohol Cases",
-        data: "getAlcoholDataPerDist",
-        threshold: 30,
-        columnName: "AlcoholCases",
-        districtId: districtId,
-        district: null,
-        year: 2018
-      }
+    let newDataReq:LineChartPerDistDataReq = {
+      onSubmit: true,
+      districtId: (form.value.districtId=="")?1:+form.value.districtId,
+      parameterNumber: (form.value.parameter == "") ? 1 : +form.value.parameter,
+      year : 2017
     }
-    if (parameter == "suicideCases") {
-      return {
-        yLabel: "Suicide Cases",
-        data: "getSuicideDataPerDist",
-        threshold: 6,
-        columnName: "SuicideCases",
-        districtId: districtId,
-        district: null,
-        year: 2018
-      }
-    }
+    this.linechartPerDistService.createDataReq(newDataReq);
   }
-
 
 }

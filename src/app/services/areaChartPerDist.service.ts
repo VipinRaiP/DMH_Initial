@@ -1,18 +1,18 @@
 
-import { LineChartPerDistParameters, LineChartPerDistDataReq } from '../model/linechartPerDistParameters.model';
+import { AreaChartPerDistParameters } from '../model/areaChartPerDistParameters.model';
 import { Subject } from 'rxjs';
+import { AreaChartPerDistDataReq } from '../model/areaChartPerDistDataReq.model';
 
 
-export class LineChartPerDistService{
-    private parameters:LineChartPerDistParameters;
-    private parametersUpdated = new Subject<LineChartPerDistParameters>();
+export class AreaChartPerDistService{
+    private parameters:AreaChartPerDistParameters;
+    private parametersUpdated = new Subject<AreaChartPerDistParameters>();
 
-    private dataReq:LineChartPerDistDataReq;
-    private dataReqUpdated = new Subject<LineChartPerDistDataReq>();
+    private dataReq:AreaChartPerDistDataReq;
+    private dataReqUpdated = new Subject<AreaChartPerDistDataReq>();
 
     private chartData:any;
     private chartDataUpdated = new Subject<any>();
-
 
     getParametersUpdateListener(){
         return this.parametersUpdated.asObservable();
@@ -22,15 +22,16 @@ export class LineChartPerDistService{
         return this.parameters;
     }
 
-    updateParameters(newParameters:LineChartPerDistParameters){
-        console.log("Line chart : Parameter update received")
+    updateParameters(newParameters:AreaChartPerDistParameters){
+        console.log("called areachat parameter service")
+        console.log(newParameters);
         this.parameters = newParameters;
         this.parametersUpdated.next(this.parameters);
     }
 
-     /* Listner for data requesting */
+    /* Listner for data requesting */
 
-     getDataReqListener(){
+    getDataReqListener(){
         return this.dataReqUpdated.asObservable();
     }
 
@@ -38,16 +39,16 @@ export class LineChartPerDistService{
         return this.dataReq;
     }
 
-    createDataReq(newDataReq:LineChartPerDistDataReq){
-        console.log("Line Chart : Data req received");
+    createDataReq(newDataReq:AreaChartPerDistDataReq){
+        console.log("Data req created in service.... ")
         this.dataReq = newDataReq;
         console.log(this.dataReq);
         this.dataReqUpdated.next(this.dataReq);
     }
 
-    /* Chart Data Listener */
+     /* Chart Data Listener */
 
-    getChartDataListener(){
+     getChartDataListener(){
         return this.chartDataUpdated.asObservable();
     }
 
@@ -56,11 +57,10 @@ export class LineChartPerDistService{
     }
 
     updateChartData(newData:any){
-        console.log("Line Chart : Data update received");
+        console.log("Update received");
         console.log(newData);
         this.chartData = newData;
         this.chartDataUpdated.next(this.chartData);
     }
-
 
 }

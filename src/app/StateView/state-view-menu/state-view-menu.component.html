@@ -4,8 +4,7 @@
             <div class="col-md-2">
                 <div class="form-group">
                     <select ngModel class="form-control select" name="parameter">
-                        <option selected value="">Select Parameter</option>    
-                        <option selected value=1>Alcohol Cases</option>
+                        <option selected value="">Alcohol Cases</option>
                         <option value=2>Suicide Cases</option>
                     </select>
                 </div>
@@ -19,6 +18,5 @@
         </div>
     </form>
 
-    <app-bar-chart-state *ngIf="paramNumber==1"></app-bar-chart-state>
-    <app-bar-chart-state *ngIf="paramNumber==2"></app-bar-chart-state>
+    <app-bar-chart-state></app-bar-chart-state>
 </div>
