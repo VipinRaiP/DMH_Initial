@@ -1,7 +1,7 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from "@angular/common/http";
-import { MatSliderModule, MatNativeDateModule, MatInputModule, MatRadioModule } from '@angular/material'
+import { MatSliderModule, MatNativeDateModule, MatInputModule, MatRadioModule, MatSlideToggleModule } from '@angular/material'
 import { BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {Ng5SliderModule} from 'ng5-slider';
 import {MatDatepickerModule,MatFormFieldModule} from '@angular/material';
@@ -26,6 +26,9 @@ import { StateViewGranularComponent } from './StateView/state-view-granular/stat
 import { BarChartStateService } from './services/bar-chart-state.service';
 import { AreaChartPerDistComponent } from './PerDist/area-chart-per-dist/area-chart-per-dist.component';
 import { AreaChartPerDistService } from './services/areaChartPerDist.service';
+import { MainMapComponent } from './AllDist/main-map/main-map.component';
+import { MapDetailsComponent } from './AllDist/map-details/map-details.component';
+import { MapService } from './AllDist/main-map/main-map.service';
 
 
 @NgModule({
@@ -43,6 +46,8 @@ import { AreaChartPerDistService } from './services/areaChartPerDist.service';
     StateViewMenuComponent,
     StateViewGranularComponent,
     AreaChartPerDistComponent,
+    MainMapComponent,
+    MapDetailsComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,13 +63,15 @@ import { AreaChartPerDistService } from './services/areaChartPerDist.service';
     FormsModule,
     ReactiveFormsModule, 
     MatRadioModule,
-    ModalModule
+    ModalModule,
+    MatSlideToggleModule
   ],
   providers: [BarChartAllDistService,
               LineChartPerDistService,
               BarChartStateService,
               Title,
-              AreaChartPerDistService
+              AreaChartPerDistService,
+              MapService
             ],
   bootstrap: [AppComponent]
 })

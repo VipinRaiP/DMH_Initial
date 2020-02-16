@@ -1,0 +1,26 @@
+@font-face { font-family:"Times New Roman";font-variant:normal;font-style:normal;font-weight:normal;src:url("#FontID2") format(svg)}
+    @font-face { font-family:"Arial";font-variant:normal;font-style:normal;font-weight:normal;src:url("#FontID1") format(svg)}
+    @font-face { font-family:"Arial";font-variant:normal;font-style:normal;font-weight:bold;src:url("#FontID0") format(svg)}
+    .str1 {stroke:black;stroke-width:10;stroke-miterlimit:3.864;stroke-opacity:0.501961}
+    .str3 {stroke:black;stroke-width:50;stroke-miterlimit:22.9256}
+    .str2 {stroke:#3F3E3F;stroke-width:10;stroke-miterlimit:3.864}
+    .str0 {stroke:black;stroke-width:10;stroke-miterlimit:22.9256}
+    .str0:hover { fill:#4d4d4d}
+    .fil12 {fill:none}
+    .fil4 {fill:#FEFEFE}
+    .fil11 {fill:#2B2A29}
+    .fil1 {fill:#F4ECF0}
+    .fil0 {fill:#E8F0D8}
+    .fil2 {fill:#D2DBF0}
+    .fil8 {fill:black}
+    .fil6 {fill:#000066}
+    .fil3 {fill:lemonchiffon}
+    .fil10 {fill:#FEFEFE;fill-rule:nonzero}
+    .fil9 {fill:#D9DADA;fill-rule:nonzero}
+    .fil7 {fill:#FEFEFE;fill-rule:nonzero;fill-opacity:0.501961}
+    .fil5 {fill:#FEFEFE;fill-opacity:0.701961}
+    .fnt0 {font-weight:bold;font-size:282.21px;font-family:'Arial'}
+    .fnt1 {font-weight:normal;font-size:282.22px;font-family:'Arial'}
+    .fnt2 {font-weight:normal;font-size:352.78px;font-family:'Times New Roman'}
+    .level1 {fill: black}
+    .level2 {fill: blue}
