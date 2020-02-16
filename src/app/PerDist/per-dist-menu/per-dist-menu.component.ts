@@ -16,7 +16,9 @@ export class PerDistMenuComponent implements OnInit {
 
   private choosenDistrictId: number = 0;
   private distId = [];
-
+  private distNames = [{
+    name :"dk",
+    id : 1},{name:"uk",id:2},{name:"Mysore",id:3}];
 
   constructor(private router: Router, private linechartPerDistService: LineChartPerDistService,
     private route: ActivatedRoute, private areaChartPerDistService: AreaChartPerDistService) { }
@@ -34,6 +36,8 @@ export class PerDistMenuComponent implements OnInit {
   }
 
   onSubmit(form: NgForm) {
+    console.log("Per dist form submitted")
+    console.log(form)
     let newDataReq:LineChartPerDistDataReq = {
       onSubmit: true,
       districtId: (form.value.districtId=="")?1:+form.value.districtId,

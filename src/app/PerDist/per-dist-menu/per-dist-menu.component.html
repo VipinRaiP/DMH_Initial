@@ -8,6 +8,14 @@
                     <option value=3>3</option>
                 </select>
             </div>
+            <!--div class="col-md-2 form-group">
+                <select ngModel class="form-control" name="districtId_test">
+                    <option selected value="">{{distNames[0].name}}</option>
+                    <div *ngFor="let dist of distNames; let in = index">
+                        <option>{{in}}</option>    
+                    </div>
+                </select>
+            </div-->
             <div class="col-md-2 form-group">
                 <select ngModel class="form-control" name="parameter">
                     <option selected value="">Alcohol Cases</option>

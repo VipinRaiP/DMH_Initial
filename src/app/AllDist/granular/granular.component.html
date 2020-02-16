@@ -35,13 +35,19 @@
     </mat-radio-group>
   </div>
 </div>
-
 <div class="row">
-  <div class="col=md-3">
+  <div class="col-md-3">
     <label for="Sort by">Sort By : </label>
     <select ngModel class="select" (change)="onSortByChange($event)" name="parameter">
       <option value="">{{parameterName}}</option>
       <option value=2>District Name</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <!--label for="Normalise">Data Type : </label-->
+    <select ngModel class="select" (change)="onNormaliseChange($event)" name="Normalise">
+      <option value="">Actual Data</option>
+      <option value=2>Population Normalised</option>
     </select>
   </div>  
 </div>

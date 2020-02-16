@@ -59,6 +59,7 @@ export class GranularPerDistComponent implements OnInit {
   private districtName: number;
   private timeFieldName: string = 'ReportingMonthyear';
   private parameterNumber:number = 1;
+  private parameterName:string;
 
   constructor(private http: HttpClient, private linechartPerDistService: LineChartPerDistService) {
 
@@ -127,12 +128,14 @@ export class GranularPerDistComponent implements OnInit {
    * ***************************************************************************************************************************/
 
   resolveChartParameters(districtId, parameterNumber) {
+    this.parameterName = this.resolveParameterName(parameterNumber);
+    console.log("New parameter name : " + this.parameterName)
     if (parameterNumber == 1) {
       this.dataURL = "getAlcoholDataPerDist";
       return {
         yLabel: "Alcohol Cases",
         threshold: 30,
-        yColumnName: "AlcoholCases",
+        yColumnName: this.parameterName
       }
     }
     if (parameterNumber == 2) {
@@ -140,7 +143,7 @@ export class GranularPerDistComponent implements OnInit {
       return {
         yLabel: "Suicide Cases",
         threshold: 6,
-        yColumnName: "SuicideCases",
+        yColumnName: this.parameterName
       }
     }
   }
@@ -196,6 +199,23 @@ export class GranularPerDistComponent implements OnInit {
       d[this.timeFieldName] = new Date(d[this.timeFieldName]).getTime();
     })
     return filterData;
+  }
+
+   /* ******************************************************************************************************************************
+   *  Resolve parameter name
+   * 
+   * *****************************************************************************************************************************/
+
+  resolveParameterName(parameterNumber) {
+    switch (+parameterNumber) {
+      case 1:
+        return 'Alcohol Cases';
+        break;
+      case 2:
+        console.log("Suicide cases case")
+        return 'Suicide Cases';
+        break;
+    }
   }
 
 
