@@ -18,7 +18,7 @@ import { LineChartPerDistService } from '../../services/lineChartPerDist.service
 import { curveNatural } from 'd3';
 
 //import moment = require('moment');
-
+//new comment
 const moment = _rollupMoment || _moment; _moment;
 
 
