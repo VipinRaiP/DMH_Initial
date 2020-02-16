@@ -62,14 +62,12 @@ export class GranularComponent implements OnInit {
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
   private parameterName: string;
   private chartParameters: BarChartAllDistParameters;
+  private actualData: any;
+  private dataURL: any;
+  private data: any;
+  private normaliseChoosen=1;
+  private sortByChoosen=1;
 
-  @Input()
-  dataURL: any;
-
-  @Output()
-  data: any;
-  @Output()
-  yearChange = new EventEmitter<any>()
 
   constructor(private http: HttpClient, private barChartService: BarChartAllDistService, ) { }
 
@@ -221,6 +219,7 @@ export class GranularComponent implements OnInit {
       data: this.data,
       year: this.year
     });*/
+    this.actualData = JSON.parse(JSON.stringify(this.data));
     this.sendDataToChart();
   }
 
@@ -229,15 +228,17 @@ export class GranularComponent implements OnInit {
    *
    * ***************************************************************************************************************************/
 
-    sendDataToChart(){
-      let sendingData = {
-        year: this.year,
-        granular: this.granularChoosen,
-        choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
-        data: this.data,
-      }
-      this.barChartService.updateChartData(sendingData);
+  sendDataToChart() {
+    this.normaliseData(this.normaliseChoosen);
+    this.sortData(this.sortByChoosen);
+    let sendingData = {
+      year: this.year,
+      granular: this.granularChoosen,
+      choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
+      data: this.data,
     }
+    this.barChartService.updateChartData(sendingData);
+  }
 
 
   /**********************************************************************************************************************************
@@ -317,16 +318,16 @@ export class GranularComponent implements OnInit {
   }
 
   /* ******************************************************************************************************************************
-   *  Sort By optinon
+   *  Sort By option
    * 
    * *****************************************************************************************************************************/
 
   onSortByChange(event) {
-    let sortByChoosen = (event.target.value == "") ? 1 : event.target.value;
+    this.sortByChoosen = (event.target.value == "") ? 1 : event.target.value;
     console.log("All Dist: Sort by option changed");
     console.log(this.data);
     if (this.data.length != 0) {
-      this.sortData(sortByChoosen);
+      this.sortData(this.sortByChoosen);
       this.sendDataToChart();
     }
   }
@@ -341,15 +342,50 @@ export class GranularComponent implements OnInit {
         sortAttributeName = 'District';
         break;
     }
-    this.data.sort(function(a, b){
-      return a[sortAttributeName] < b[sortAttributeName]? -1: a[sortAttributeName]>b[sortAttributeName]?1:0;
+    this.data.sort(function (a, b) {
+      return a[sortAttributeName] < b[sortAttributeName] ? -1 : a[sortAttributeName] > b[sortAttributeName] ? 1 : 0;
     })
     console.log(this.data)
   }
 
+  /* ******************************************************************************************************************************
+   *  Normalise Data option
+   * 
+   * *****************************************************************************************************************************/
 
+  onNormaliseChange(event) {
+    this.normaliseChoosen = (event.target.value == "") ? 1 : event.target.value;
+    console.log("All Dist: Normalise option changed");
+    console.log(this.data);
+    if (this.data.length != 0) {
+      this.normaliseData(this.normaliseChoosen);
+      this.sendDataToChart();
+    }
+  }
 
-
+  normaliseData(normaliseChoosen) {
+    let postData: any;
+    switch (+normaliseChoosen) {
+      case 1:
+        console.log("Actual Data")
+        console.log(this.actualData)
+        this.data = JSON.parse(JSON.stringify(this.actualData));
+        break;
+      case 2:
+        postData = {
+          wrtColumn : "Population",
+          targetColumn : this.parameterName,
+          data : this.actualData
+        }
+        break;
+    }
+    if (+normaliseChoosen != 1) {
+        this.data.forEach((d)=>{
+          console.log((d[postData.targetColumn]/d[postData.wrtColumn])*100);
+          d[postData.targetColumn] = d[postData.targetColumn]/d[postData.wrtColumn] * 100;
+        })
+    }
+  }
 }
 
 

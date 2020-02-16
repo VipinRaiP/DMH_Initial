@@ -49,7 +49,8 @@ export class StateViewGranularComponent implements OnInit {
   private annualData: any;
   private quarterChoosen: number = 1;
   private monthChoosen: number = 1;
-  private monthName = "Jan"; e;
+  private monthName = "Jan";
+  private parameterName:string;
 
   private parameterNumber: number; // type of parameter : alcohol, suicide
   private dataURL: {
@@ -188,6 +189,8 @@ export class StateViewGranularComponent implements OnInit {
    * *****************************************************************************************************************************/
 
   resolveChartParameters(paramNumber: number) {
+    this.parameterName = this.resolveParameterName(paramNumber);
+    console.log("New parameter name : " + this.parameterName)
     if (this.parameterNumber != paramNumber)
       this.dataRequests = 0;
     if (paramNumber == 1) {
@@ -199,7 +202,7 @@ export class StateViewGranularComponent implements OnInit {
       return {
         yLabel: "Alcohol Cases",
         threshold: 20000,
-        yColumnName: "AlcoholCases",
+        yColumnName: this.parameterName,
         parameterNumber: paramNumber
       }
     }
@@ -212,7 +215,7 @@ export class StateViewGranularComponent implements OnInit {
       return {
         yLabel: "Suicide Cases",
         threshold: 3000,
-        yColumnName: "SuicideCases",
+        yColumnName: this.parameterName,
         parameterNumber: paramNumber
       }
     }
@@ -242,5 +245,24 @@ export class StateViewGranularComponent implements OnInit {
       this.updateData();
     this.dataRequests += 1;
   }
+
+  /* ******************************************************************************************************************************
+   *  Resolve parameter name
+   * 
+   * *****************************************************************************************************************************/
+
+  resolveParameterName(parameterNumber) {
+    switch (+parameterNumber) {
+      case 1:
+        return 'Alcohol Cases';
+        break;
+      case 2:
+        console.log("Suicide cases case")
+        return 'Suicide Cases';
+        break;
+    }
+  }
+
+
 
 }
