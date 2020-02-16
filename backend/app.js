@@ -100,7 +100,6 @@ app.get("/", function (req, res, next) {
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  //password: "password"
   password: "root"
 });
 
@@ -712,10 +711,11 @@ app.post("/getPerDistSuicideDataQuart", (req, res) => {
   console.log(data);
   res.json(data);
  });
-=======
+  
+/*********************************************************************************************************************************
  *  Map APIs
  * 
- * *******************************************************************************************************************************/
+ *********************************************************************************************************************************/
 
 app.post("/getAlcoholMonthlyperDistrictforMap", (req, res) => {
   var year = req.body.year;
