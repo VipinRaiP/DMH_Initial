@@ -1,16 +1,5 @@
 <div class="row">
-  <div *ngIf="displayMonthData" class="col-md-3">
-    <label for="MonthSelected">Month: {{monthName}}</label>
-    <br>
-    <mat-slider [disabled]="granularChoosen==1" #slider min="1" max="12" step="1" value="1"
-      (input)="onMonthChange($event)"></mat-slider>
-  </div>
-  <div *ngIf="displayQuarterData" class="col-md-3">
-    <label for="QuarterSelected">Quarter: {{quarterChoosen}}</label>
-    <br>
-    <mat-slider [disabled]="granularChoosen==1" #slider min="1" max="4" step="1" value="1"
-      (input)="onQuarterChange($event)"></mat-slider>
-  </div>
+  
   <div class="col-md-3">
     <mat-radio-group (change)="onGranularChange($event)" aria-label="Select an option">
       <mat-radio-button [checked]="true" value="1">Annual</mat-radio-button>
@@ -29,10 +18,17 @@
     <!--button class="btn btn-primary"
           (click)="displayMonthData = !displayMonthData;displayQuarterData=!displayQuarterData">Check</!--button-->
   </div>
-  <div class="col-md-3">
-    <mat-radio-group aria-label="Select an option">
-      <mat-radio-button value="1">View on map</mat-radio-button>
-    </mat-radio-group>
+  <div *ngIf="displayMonthData" class="col-md-3">
+    <label for="MonthSelected">Month: {{monthName}}</label>
+    <br>
+    <mat-slider [disabled]="granularChoosen==1" #slider min="1" max="12" step="1" value="1"
+      (input)="onMonthChange($event)"></mat-slider>
+  </div>
+  <div *ngIf="displayQuarterData" class="col-md-3">
+    <label for="QuarterSelected">Quarter: {{quarterChoosen}}</label>
+    <br>
+    <mat-slider [disabled]="granularChoosen==1" #slider min="1" max="4" step="1" value="1"
+      (input)="onQuarterChange($event)"></mat-slider>
   </div>
 </div>
 

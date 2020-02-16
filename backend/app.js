@@ -100,7 +100,8 @@ app.get("/", function (req, res, next) {
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password"
+  //password: "password"
+  password: "root"
 });
 
 con.connect(function (err) {
@@ -693,8 +694,71 @@ app.post("/getPerDistSuicideDataQuart", (req, res) => {
 
 /* ********************************************************************************************************************************
  *  
- *  
+ *  Map APIs
  * 
  * *******************************************************************************************************************************/
+
+app.post("/getAlcoholMonthlyperDistrictforMap", (req, res) => {
+  var year = req.body.year;
+  var district = req.body.district;
+  sql = "select d.District as Districtid ,\
+  MONTH(c.ReportingMonthyear) as month ,\
+  sum(c.new_alcohal_male)+sum(c.new_alcohal_female)+sum(c.old_alcohal_male)+sum(c.old_alcohal_female) as total_alcohol_cases \
+  from Clinical_Data c , Districts d  \
+  where d.DistrictId = c.Districtid and d.District=? and YEAR(c.ReportingMonthyear)=?\
+  group by c.ReportingMonthyear";
+  con.query(sql, [district,year], function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  });
+})
+
+app.post("/getAlcoholQuarterlyperDistrictforMap", (req, res) => {
+  var year = req.body.year;
+  var district = req.body.district;
+  sql = "select Quarter,District,\
+  (sum(old_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)+sum(new_alcohal_male)) as AlcoholCases \
+   from (SELECT CASE \
+        WHEN MONTH(ReportingMonthYear)>=1 and MONTH(ReportingMonthYear)<=4 THEN 1 \
+        WHEN MONTH(ReportingMonthYear)>=5 and MONTH(ReportingMonthYear)<=8 THEN 2 \
+        WHEN MONTH(ReportingMonthYear)>=9 and MONTH(ReportingMonthYear)<=12 THEN 3 \
+        END as Quarter,c.DistrictId,c.new_alcohal_male,c.old_alcohal_male,c.new_alcohal_female,\
+        c.old_alcohal_female , d.District \
+        from Clinical_Data c , Districts d \
+  where d.DistrictId = c.Districtid and d.District=? and year(c.ReportingMonthyear)=? ) q \
+        group by Quarter";
+  con.query(sql, [district,year], function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  });
+})
+
+app.post("/getAlcoholYearlyperDistrictforMap", (req, res) => {
+  var year = req.body.year;
+  var district = req.body.district;
+  sql = "select d.District as Districtid ,YEAR(c.ReportingMonthyear) ,sum(c.new_alcohal_male)+sum(c.new_alcohal_female)+sum(c.old_alcohal_male)+sum(c.old_alcohal_female) as total_alcohol_cases \
+  from Clinical_Data c , Districts d  where d.DistrictId = c.Districtid and d.District=? and YEAR(c.ReportingMonthyear)=? \
+  group by YEAR(c.ReportingMonthyear)";
+  con.query(sql, [district,year], function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  });
+})
+
+app.post("/getAlcoholYearlyDistrictforMap", (req, res) => {
+  var year = req.body.year;
+  sql = "select d.District as Districtid ,year(c.ReportingMonthyear) ,sum(c.new_alcohal_male)+sum(c.new_alcohal_female)+sum(c.old_alcohal_male)+sum(c.old_alcohal_female) \
+  as total_alcohol_cases\
+  from Clinical_Data c , Districts d  where d.DistrictId = c.Districtid and year(c.ReportingMonthyear)=?\
+  group by year(c.ReportingMonthyear) ,d.District order by total_alcohol_cases";
+  con.query(sql, [year], function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  });
+})
 
 module.exports = app;

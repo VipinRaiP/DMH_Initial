@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { BarChartAllDistParameters } from '../../model/barchartAllDistParameters.model';
 import { BarChartAllDistService } from '../../services/barchartAllDist.service';
 import { BarChartAllDistDataReq } from 'src/app/model/barchartAllDistDataReq.model';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-all-dist-menu',
@@ -13,6 +14,10 @@ import { BarChartAllDistDataReq } from 'src/app/model/barchartAllDistDataReq.mod
   styleUrls: ['./all-dist-menu.component.css']
 })
 export class AllDistMenuComponent implements OnInit, OnDestroy {
+
+  mapView :boolean = false;
+
+
   @Input()
   private parameterNumber: number = 1;
   private params = Array(3);
@@ -31,7 +36,11 @@ export class AllDistMenuComponent implements OnInit, OnDestroy {
     }
     this.barChartService.createDataReq(newDataReq);  
   }
-
+  mapToggle()
+  {
+    this.mapView = !this.mapView;
+    console.log("MAP TOGGLE "+ this.mapView);
+  }
   onSubmit(form: NgForm) {
     let parameters: BarChartAllDistParameters;
     this.parameterNumber = (form.value.parameter=="")?1:form.value.parameter;
