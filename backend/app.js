@@ -780,5 +780,42 @@ app.post("/getAlcoholYearlyDistrictforMap", (req, res) => {
   });
 })
 
+/* ********************************************************************************************************************************
+ *  
+ *  Expense API
+ * 
+ * *******************************************************************************************************************************/
+
+
+app.post("/getYearlyExpenseDistrictwise", (req, res) => {
+  var year = req.body.year;
+  sql ="Select d.District, sum(B3032_Psychiatrists) as B3032_Psychiatrists, sum(B30112_Psyst_Counsellor) as B30112_Psyst_Counsellor, sum(B30114_SocialWorker) as B30114_SocialWorker, sum(B3012_StaffNurse) as B3012_StaffNurse,\
+  sum(B3012_PsyNurse) as B3012_PsyNurse, sum(B30137_MedialRedAsst) as B30137_MedialRedAsst, sum(B30137_WardAsst) as B30137_WardAsst, sum(Infrastucture) as Infrastucture, \
+  sum(Training) as Training, sum(IEC) as IEC, sum(TargetIntervention) as TargetIntervention, sum(Drugs) as Drugs, sum(Equipments) as Equipments, sum(OperationExpense) as OperationExpense, \
+  sum(AmbulatoryService) as AmbulatoryService, sum(Miscellanious) as Miscellanious, sum(B3032_PsychiatristsTA) as B3032_PsychiatristsTA, sum(B30114_SocialWorkerTA) as B30114_SocialWorkerTA, sum(B10162_Awarness) as B10162_Awarness, \
+  sum(J17_Contingency) as J17_Contingency, sum(J18_InnovationMH) as J18_InnovationMH, sum(B2030_AnnualIncrement) as B2030_AnnualIncrement \
+  from District_Expense de , Districts d \
+  where d.DistrictId=de.DistrictId and YEAR(de.ReportingMonthYear)=2019 \
+  group by YEAR(de.ReportingMonthYear),d.District order by d.district";
+  con.query(sql, [year], function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  });
+})
+
+
+app.post("/getYearlyExpenseDistrictwiselineChart", (req, res) => {
+  var year = req.body.year;
+  sql ="select d.district ,sum(new_alcohal_male)+sum(new_alcohal_female)+sum(old_alcohal_male)+sum(old_alcohal_female) as total\
+  from Clinical_Data c , Districts d where d.Districtid = c.Districtid and year(ReportingMonthyear) = ?\
+  group by d.district order by d.district;"
+  con.query(sql, [year], function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  });
+})
+
 
 module.exports = app;

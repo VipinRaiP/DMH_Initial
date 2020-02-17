@@ -29,6 +29,8 @@ import { AreaChartPerDistService } from './services/areaChartPerDist.service';
 import { MainMapComponent } from './AllDist/main-map/main-map.component';
 import { MapDetailsComponent } from './AllDist/map-details/map-details.component';
 import { MapService } from './AllDist/main-map/main-map.service';
+import { ExpenseComponent } from './expense/expense.component';
+import { ExpenseMenuComponent } from './expense/expense-menu/expense-menu.component';
 
 
 @NgModule({
@@ -48,6 +50,8 @@ import { MapService } from './AllDist/main-map/main-map.service';
     AreaChartPerDistComponent,
     MainMapComponent,
     MapDetailsComponent,
+    ExpenseComponent,
+    ExpenseMenuComponent
   ],
   imports: [
     BrowserModule,
