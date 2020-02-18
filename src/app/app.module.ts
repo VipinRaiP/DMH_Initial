@@ -1,7 +1,7 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from "@angular/common/http";
-import { MatSliderModule, MatNativeDateModule, MatInputModule, MatRadioModule, MatSlideToggleModule } from '@angular/material'
+import { MatSliderModule, MatNativeDateModule, MatInputModule, MatRadioModule, MatSlideToggleModule, MatDialogModule } from '@angular/material'
 import { BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {Ng5SliderModule} from 'ng5-slider';
 import {MatDatepickerModule,MatFormFieldModule} from '@angular/material';
@@ -29,6 +29,9 @@ import { AreaChartPerDistService } from './services/areaChartPerDist.service';
 import { MainMapComponent } from './AllDist/main-map/main-map.component';
 import { MapDetailsComponent } from './AllDist/map-details/map-details.component';
 import { MapService } from './AllDist/main-map/main-map.service';
+import { ExpenseComponent, DialogDataExampleDialog } from './expense/expense.component';
+import { ExpenseMenuComponent } from './expense/expense-menu/expense-menu.component';
+import {ExpenseService } from './expense/expense.service'
 
 
 @NgModule({
@@ -48,6 +51,12 @@ import { MapService } from './AllDist/main-map/main-map.service';
     AreaChartPerDistComponent,
     MainMapComponent,
     MapDetailsComponent,
+    ExpenseComponent,
+    ExpenseMenuComponent,
+    DialogDataExampleDialog
+  ],
+  entryComponents: [
+    DialogDataExampleDialog
   ],
   imports: [
     BrowserModule,
@@ -64,14 +73,16 @@ import { MapService } from './AllDist/main-map/main-map.service';
     ReactiveFormsModule, 
     MatRadioModule,
     ModalModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatDialogModule
   ],
   providers: [BarChartAllDistService,
               LineChartPerDistService,
               BarChartStateService,
               Title,
               AreaChartPerDistService,
-              MapService
+              MapService,
+              ExpenseService
             ],
   bootstrap: [AppComponent]
 })
