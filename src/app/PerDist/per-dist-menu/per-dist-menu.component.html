@@ -3,19 +3,9 @@
         <div class="row">
             <div class="col-md-2 form-group">
                 <select ngModel class="form-control" name="districtId">
-                    <option selected value="">1</option>
-                    <option value=2>2</option>
-                    <option value=3>3</option>
+                    <option *ngFor="let dist of districtData" value={{dist.DistrictId}}>{{dist.District}}</option>
                 </select>
             </div>
-            <!--div class="col-md-2 form-group">
-                <select ngModel class="form-control" name="districtId_test">
-                    <option selected value="">{{distNames[0].name}}</option>
-                    <div *ngFor="let dist of distNames; let in = index">
-                        <option>{{in}}</option>    
-                    </div>
-                </select>
-            </div-->
             <div class="col-md-2 form-group">
                 <select ngModel class="form-control" name="parameter">
                     <option selected value="">Alcohol Cases</option>

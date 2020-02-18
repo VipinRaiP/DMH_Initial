@@ -246,7 +246,7 @@ app.post("/getAlcoholDataAllDistMonthly", (req, res) => {
     from Clinical_Data \
     where year(ReportingMonthyear)=?) m, Districts d \
     where m.DistrictId = d.DistrictId \
-    group by m.Month,m.DistrictId \
+    group by m.Month,m.DistrictId,d.Population \
     order by Month,`Alcohol Cases`";
 
   con.query(sql, [year], function (err, response) {
@@ -282,7 +282,7 @@ app.post("/getSuicideDataAllDistMonthly", (req, res) => {
         from Clinical_Data \
         where year(ReportingMonthyear)=? ) m, Districts d \
         where m.DistrictId = d.DistrictId \
-        group by m.Month,d.DistrictId \
+        group by m.Month,d.DistrictId,d.Population \
         order by m.Month,`Suicide Cases`";
 
 
@@ -308,7 +308,7 @@ app.post("/getAlcoholDataAllDistQuart", (req, res) => {
               from Clinical_Data \
               where year(ReportingMonthyear)=?) q , Districts d\
               where q.DistrictId = d.DistrictId \
-              group by q.Quarter,q.DistrictId\
+              group by q.Quarter,q.DistrictId,d.Population\
               order by q.Quarter,`Alcohol Cases`";
 
   con.query(sql, [year], function (err, response) {
@@ -331,7 +331,7 @@ app.post("/getSuicideDataAllDistQuart", (req, res) => {
         END as Quarter,DistrictId,old_male_suicidecases,new_male_suicidecases,old_female_suicidecases,new_female_suicidecases\
         from Clinical_Data where year(ReportingMonthyear)=?) q,Districts d \
         where q.DistrictId = d.DistrictId  \
-        group by q.Quarter,d.DistrictId \
+        group by q.Quarter,d.DistrictId,d.Population \
         order by q.Quarter,`Suicide Cases`";
 
   con.query(sql, [year], function (err, response) {
@@ -349,7 +349,7 @@ app.post("/getAlcoholDataAllDistAnnually", (req, res) => {
         (sum(old_alcohal_male)+sum(new_alcohal_male)+sum(old_alcohal_female)+sum(new_alcohal_female)) as `Alcohol Cases` \
         from Clinical_Data m,Districts d\
         where year(ReportingMonthyear)=? and m.DistrictId = d.DistrictId\
-        group by m.DistrictId \
+        group by m.DistrictId,d.Population \
         order by `Alcohol Cases`  "
 
   con.query(sql, [year], function (err, response) {
@@ -366,7 +366,7 @@ app.post("/getSuicideDataAllDistAnnually", (req, res) => {
         (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_male_suicidecases)+sum(new_male_suicidecases)) as `Suicide Cases` \
         from Clinical_Data m, Districts d \
         where year(ReportingMonthyear)=? and m.DistrictId=d.DistrictId\
-        group by m.DistrictId \
+        group by m.DistrictId,d.Population \
         order by `Suicide Cases`";
   con.query(sql, [year], function (err, response) {
     if (err) console.log(err);
@@ -380,7 +380,7 @@ app.post("/getSuicideDataAllDistAnnually", (req, res) => {
  *
  * ****************************************************************************************************************************/
 
-const month  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug',"Sep",'Oct','Nov','Dec'];
+const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', "Sep", 'Oct', 'Nov', 'Dec'];
 
 app.get("/getStateAlcoholDataMonthly", (req, res) => {
 
@@ -408,13 +408,13 @@ app.get("/getStateAlcoholDataMonthly", (req, res) => {
     if (err) console.log(err);
     console.log(response);
     var responseGrouped = jsonGroupBy(response, ['Year']);
-   /* for( d1 in responseGrouped){
-      d1.forEach(element => {
-        
-      });( (d2) =>{
-          d2['Month'] = month[d2['month']-1]; 
-      })
-    }*/
+    /* for( d1 in responseGrouped){
+       d1.forEach(element => {
+         
+       });( (d2) =>{
+           d2['Month'] = month[d2['month']-1]; 
+       })
+     }*/
     res.json(responseGrouped);
   });
 })
@@ -450,7 +450,7 @@ app.get("/getStateAlcoholDataQuart", (req, res) => {
         group by q.Year,q.Quarter 
         order by q.Year,q.Quarter`;
 
-  con.query(sql,function (err, response) {
+  con.query(sql, function (err, response) {
     if (err) console.log(err);
     console.log(response);
     //var responseGrouped = jsonGroupBy(response, ['Quarter']);
@@ -461,8 +461,8 @@ app.get("/getStateAlcoholDataQuart", (req, res) => {
 
 app.get("/getStateSuicideDataMonthly", (req, res) => {
 
-  
-  console.log(req.body);  
+
+  console.log(req.body);
   sql = `select m.Year,m.Month, 
           (sum(old_male_suicidecases)+sum(new_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)) as \`Suicide Cases\` 
           from (SELECT CASE 
@@ -483,7 +483,7 @@ app.get("/getStateSuicideDataMonthly", (req, res) => {
           group by m.Year,m.Month 
           order by m.Year,m.Month`
 
-  con.query(sql,function (err, response) {
+  con.query(sql, function (err, response) {
     if (err) console.log(err);
     console.log(response);
     var responseGrouped = jsonGroupBy(response, ['Year']);
@@ -494,14 +494,14 @@ app.get("/getStateSuicideDataMonthly", (req, res) => {
 
 app.get("/getStateSuicideDataYearly", (req, res) => {
 
-  sql =  `select m.Year, 
+  sql = `select m.Year, 
           (sum(old_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)+sum(new_male_suicidecases)) as \`SuicideCases\` 
           from (SELECT year(ReportingMonthyear) as Year,old_male_suicidecases,new_male_suicidecases,new_female_suicidecases,old_female_suicidecases 
           from Clinical_Data) m  
           group by m.Year 
           order by m.Year`
 
-  con.query(sql,function (err, response) {
+  con.query(sql, function (err, response) {
     if (err) console.log(err);
     console.log(response);
     res.json(response);
@@ -522,7 +522,7 @@ app.get("/getStateSuicideDataQuart", (req, res) => {
         group by q.Year,q.Quarter 
         order by q.Year,q.Quarter`;
 
-  con.query(sql,function (err, response) {
+  con.query(sql, function (err, response) {
     if (err) console.log(err);
     console.log(response);
     //var responseGrouped = jsonGroupBy(response, ['Quarter']);
@@ -560,17 +560,17 @@ app.post("/getPerDistAlcoholDataMonthly", (req, res) => {
           group by Year,Month \
           order by Year,Month"
 
-  con.query(sql, [districtId],function (err, response) {
+  con.query(sql, [districtId], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     var responseGrouped = jsonGroupBy(response, ['Year']);
-   /* for( d1 in responseGrouped){
-      d1.forEach(element => {
-        
-      });( (d2) =>{
-          d2['Month'] = month[d2['month']-1]; 
-      })
-    }*/
+    /* for( d1 in responseGrouped){
+       d1.forEach(element => {
+         
+       });( (d2) =>{
+           d2['Month'] = month[d2['month']-1]; 
+       })
+     }*/
     res.json(responseGrouped);
   });
 
@@ -586,7 +586,7 @@ app.post("/getPerDistAlcoholDataYearly", (req, res) => {
           group by m.Year \
           order by m.Year"
 
-  con.query(sql,[districtId] ,function (err, response) {
+  con.query(sql, [districtId], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     res.json(response);
@@ -608,7 +608,7 @@ app.post("/getPerDistAlcoholDataQuart", (req, res) => {
         group by q.Year,q.Quarter \
         order by q.Year,q.Quarter";
 
-  con.query(sql,[districtId],function (err, response) {
+  con.query(sql, [districtId], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     //var responseGrouped = jsonGroupBy(response, ['Quarter']);
@@ -620,7 +620,7 @@ app.post("/getPerDistAlcoholDataQuart", (req, res) => {
 app.post("/getPerDistSuicideDataMonthly", (req, res) => {
 
   districtId = req.body.districtId;
-  console.log(req.body);  
+  console.log(req.body);
   sql = "select m.Year,m.Month, \
           (sum(old_male_suicidecases)+sum(new_male_suicidecases)+sum(old_female_suicidecases)+sum(new_female_suicidecases)) as SuicideCases \
           from (SELECT CASE \
@@ -642,7 +642,7 @@ app.post("/getPerDistSuicideDataMonthly", (req, res) => {
           group by m.Year,m.Month \
           order by m.Year,m.Month"
 
-  con.query(sql,[districtId],function (err, response) {
+  con.query(sql, [districtId], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     var responseGrouped = jsonGroupBy(response, ['Year']);
@@ -661,7 +661,7 @@ app.post("/getPerDistSuicideDataYearly", (req, res) => {
           group by m.Year \
           order by m.Year"
 
-  con.query(sql,[districtId],function (err, response) {
+  con.query(sql, [districtId], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     res.json(response);
@@ -682,7 +682,7 @@ app.post("/getPerDistSuicideDataQuart", (req, res) => {
         group by q.Year,q.Quarter \
         order by q.Year,q.Quarter";
 
-  con.query(sql,[districtId],function (err, response) {
+  con.query(sql, [districtId], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     //var responseGrouped = jsonGroupBy(response, ['Quarter']);
@@ -697,21 +697,21 @@ app.post("/getPerDistSuicideDataQuart", (req, res) => {
  * 
  * *******************************************************************************************************************************/
 
- app.post("/getNormalisedData",(req,res) =>{
-  data  = req.body.data;
+app.post("/getNormalisedData", (req, res) => {
+  data = req.body.data;
   targetColumn = req.body.targetColumn;
   wrtColumn = req.body.wrtColumn; // with respect to  eg : Population etc...
   console.log(targetColumn);
   console.log(wrtColumn);
-  data.forEach((d)=>{
-    console.log((d[targetColumn]/d[wrtColumn])*100);
-    d[targetColumn] = d[targetColumn]/d[wrtColumn] * 100;
+  data.forEach((d) => {
+    console.log((d[targetColumn] / d[wrtColumn]) * 100);
+    d[targetColumn] = d[targetColumn] / d[wrtColumn] * 100;
   })
   console.log("Data normalised ");
   console.log(data);
   res.json(data);
- });
-  
+});
+
 /*********************************************************************************************************************************
  *  Map APIs
  * 
@@ -726,7 +726,7 @@ app.post("/getAlcoholMonthlyperDistrictforMap", (req, res) => {
   from Clinical_Data c , Districts d  \
   where d.DistrictId = c.Districtid and d.District=? and YEAR(c.ReportingMonthyear)=?\
   group by c.ReportingMonthyear";
-  con.query(sql, [district,year], function (err, response) {
+  con.query(sql, [district, year], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     res.json(response);
@@ -747,7 +747,7 @@ app.post("/getAlcoholQuarterlyperDistrictforMap", (req, res) => {
         from Clinical_Data c , Districts d \
   where d.DistrictId = c.Districtid and d.District=? and year(c.ReportingMonthyear)=? ) q \
         group by Quarter";
-  con.query(sql, [district,year], function (err, response) {
+  con.query(sql, [district, year], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     res.json(response);
@@ -760,7 +760,7 @@ app.post("/getAlcoholYearlyperDistrictforMap", (req, res) => {
   sql = "select d.District as Districtid ,YEAR(c.ReportingMonthyear) ,sum(c.new_alcohal_male)+sum(c.new_alcohal_female)+sum(c.old_alcohal_male)+sum(c.old_alcohal_female) as total_alcohol_cases \
   from Clinical_Data c , Districts d  where d.DistrictId = c.Districtid and d.District=? and YEAR(c.ReportingMonthyear)=? \
   group by YEAR(c.ReportingMonthyear)";
-  con.query(sql, [district,year], function (err, response) {
+  con.query(sql, [district, year], function (err, response) {
     if (err) console.log(err);
     console.log(response);
     res.json(response);
@@ -780,5 +780,19 @@ app.post("/getAlcoholYearlyDistrictforMap", (req, res) => {
   });
 })
 
+/*********************************************************************************************************************************
+ *  Get Districts and Id
+ * 
+ *********************************************************************************************************************************/
+
+app.get("/getDistrictData", (req, res) => {
+  sql = `select d.DistrictId,d.District 
+        from Districts d where  DistrictId != 46`;
+  con.query(sql, function (err, response) {
+    if (err) console.log(err);
+    console.log(response);
+    res.json(response);
+  })
+});
 
 module.exports = app;
