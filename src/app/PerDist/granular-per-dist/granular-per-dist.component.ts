@@ -60,6 +60,8 @@ export class GranularPerDistComponent implements OnInit {
   private timeFieldName: string = 'ReportingMonthyear';
   private parameterNumber:number = 1;
   private parameterName:string;
+  private xColumnName = 'ReportingMonthyear';
+  private tabularData:any;
 
   constructor(private http: HttpClient, private linechartPerDistService: LineChartPerDistService) {
 
@@ -183,14 +185,16 @@ export class GranularPerDistComponent implements OnInit {
     newData  = this.dataPreprocessing(newData);
     console.log("Line chart granular: filtered data");
     console.log(newData);
-    let sendingData = {
+    /*let sendingData = {
       data: newData,
       districtId: this.districtId,
       districtName: this.districtName,
       year: year,
       xColumnName: this.timeFieldName
     }
-    this.linechartPerDistService.updateChartData(sendingData);
+    this.setTabularData();
+    this.linechartPerDistService.updateChartData(sendingData);*/
+    this.sendDataToChart(newData,year);
   }
 
   dataPreprocessing(filterData) {
@@ -200,6 +204,25 @@ export class GranularPerDistComponent implements OnInit {
     })
     return filterData;
   }
+
+  /* ******************************************************************************************************************************
+   *  Send data to chart
+   * 
+   * *****************************************************************************************************************************/
+
+    sendDataToChart(newData,year){
+      let sendingData = {
+        data: newData,
+        districtId: this.districtId,
+        districtName: this.districtName,
+        year: year,
+        xColumnName: this.timeFieldName
+      }
+      this.setTabularData();
+      this.linechartPerDistService.updateChartData(sendingData);
+    }
+
+
 
    /* ******************************************************************************************************************************
    *  Resolve parameter name
@@ -217,6 +240,21 @@ export class GranularPerDistComponent implements OnInit {
         break;
     }
   }
+
+   /* ******************************************************************************************************************************
+   *  Set Tabular Data
+   * 
+   * *****************************************************************************************************************************/
+
+   setTabularData(){
+
+      this.tabularData = JSON.parse(JSON.stringify(this.data));
+
+      this.tabularData.forEach((d)=>{
+          d[this.xColumnName] = new Date(d[this.xColumnName]).toDateString();
+      })
+   }
+
 
 
   /***************************************************************************************************************************** */
