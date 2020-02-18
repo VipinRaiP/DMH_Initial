@@ -59,11 +59,13 @@ export class StateViewGranularComponent implements OnInit {
     Quarter: string,
   }
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
-  private year: number = this.minYear;
+  private year: number = 2018;
   private quarterData: any;
   private monthlyData: any;
   private yearData: any;
   private dataRequests: number = 0;
+
+  private xColumnName:string = "Year";
 
   @Output()
   data: any;
@@ -74,6 +76,7 @@ export class StateViewGranularComponent implements OnInit {
 
   ngOnInit() {
     console.log("State Granular loaded..");
+    this.dataRequests = 0;
     // On new data request update chart parameters and data
     let newDataReq = this.barChartService.getDataReq();
     this.processDataRequests(newDataReq);
@@ -97,6 +100,7 @@ export class StateViewGranularComponent implements OnInit {
   onGranularChange(event: any) {
     console.log("Granular changed" + event.value)
     this.granularChoosen = +event.value;
+    this.xColumnName = (this.granularChoosen == 1) ? "Year" : (this.granularChoosen == 2) ? "Month" : "Quarter";
     this.updateData();
   }
 
@@ -150,6 +154,7 @@ export class StateViewGranularComponent implements OnInit {
       /* Annual */
       this.data = this.yearData;
       console.log("Year data");
+      console.log(this.year);
       console.log(this.data);
     }
     else if (this.granularChoosen == 2) {

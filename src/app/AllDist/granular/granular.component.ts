@@ -68,6 +68,8 @@ export class GranularComponent implements OnInit {
   private normaliseChoosen=1;
   private sortByChoosen=1;
 
+  private xColumnName = "District";
+
 
   constructor(private http: HttpClient, private barChartService: BarChartAllDistService, ) { }
 
