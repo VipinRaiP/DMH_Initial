@@ -53,22 +53,22 @@ export class GranularComponent implements OnInit {
   private quarterData: any;
   private monthlyData: any;
   private annualData: any;
-  private quarterChoosen: number = 1;
+  public quarterChoosen: number = 1;
   private monthChoosen: number = 1;
   private months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  private monthName = "Jan";
-  private displayMonthData = false;
-  private displayQuarterData = false;
-  private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
-  private parameterName: string;
-  private chartParameters: BarChartAllDistParameters;
+  public monthName = "Jan";
+  public displayMonthData = false;
+  public displayQuarterData = false;
+  public granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
+  public parameterName: string;
+  private chartParameters:BarChartAllDistParameters ;
   private actualData: any;
   private dataURL: any;
-  private data: any;
+  public data: any;
   private normaliseChoosen=1;
   private sortByChoosen=1;
 
-  private xColumnName = "District";
+  public xColumnName = "District";
 
 
   constructor(private http: HttpClient, private barChartService: BarChartAllDistService, ) { }
@@ -163,7 +163,7 @@ export class GranularComponent implements OnInit {
       })
   }
 
-  private yearObj = new FormControl(moment());
+  public yearObj = new FormControl(moment());
 
   choosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
     console.log("year called : " + normalizedYear.year())
@@ -259,10 +259,10 @@ export class GranularComponent implements OnInit {
         Monthly: "getAlcoholDataAllDistMonthly"
       }
       return {
-        yLabel: "Alcohol Cases",
-        threshold: 3000,
-        yColumnName: this.parameterName
-      }
+        yLabel: "Alcohol Cases", 
+        threshold : 3000, 
+        yColumnName : this.parameterName
+      }  
     }
     else if (parameterNumber == 2) {
       console.log("getting urls")

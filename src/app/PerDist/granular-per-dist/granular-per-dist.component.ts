@@ -52,16 +52,16 @@ export class GranularPerDistComponent implements OnInit {
   private yearChange = new EventEmitter<any>();
 
   private year: number = 2018;
-  private yearObj = new FormControl(moment());
-  private data: any;
+  public yearObj = new FormControl(moment());
+  public data: any;
   private dataURL: any = "getAlcoholDataPerDist";
   private districtId: number = 1;
   private districtName: number;
   private timeFieldName: string = 'ReportingMonthyear';
   private parameterNumber:number = 1;
-  private parameterName:string;
-  private xColumnName = 'ReportingMonthyear';
-  private tabularData:any;
+  public parameterName:string;
+  public xColumnName = 'ReportingMonthyear';
+  public tabularData:any;
 
   constructor(private http: HttpClient, private linechartPerDistService: LineChartPerDistService) {
 
