@@ -22,7 +22,7 @@ export class MainMapComponent implements OnInit {
   mycolor1 = "red";
   mycolor2 = "green";
   tooltipText = "HtmlContent:name <br> cases: 5566";
-  private newData :any = {};
+  public newData :any = {};
 
   constructor(private http:HttpClient,private mapService : MapService) { }
 

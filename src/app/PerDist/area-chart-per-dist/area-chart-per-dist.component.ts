@@ -40,8 +40,8 @@ export class AreaChartPerDistComponent implements OnInit {
   private toDate: any;
   private path: any;
   private line: d3.Line<[number, number]>; // this is line defination
-  private year:number;
-  private district:string;
+  public year:number;
+  public district:string;
 
   private dataURL:any;
   private xColumnName:string;

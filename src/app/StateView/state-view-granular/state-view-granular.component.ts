@@ -44,13 +44,13 @@ export const MY_FORMATS = {
   ]
 })
 export class StateViewGranularComponent implements OnInit {
-  private minYear: number = 2017;
-  private maxYear: number = new Date().getFullYear();
+  public minYear: number = 2017;
+  public maxYear: number = new Date().getFullYear();
   private annualData: any;
-  private quarterChoosen: number = 1;
+  public quarterChoosen: number = 1;
   private monthChoosen: number = 1;
   private monthName = "Jan";
-  private parameterName:string;
+  public parameterName:string;
 
   private parameterNumber: number; // type of parameter : alcohol, suicide
   private dataURL: {
@@ -58,14 +58,14 @@ export class StateViewGranularComponent implements OnInit {
     Month: string,
     Quarter: string,
   }
-  private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
-  private year: number = 2018;
+  public granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
+  public year: number = 2018;
   private quarterData: any;
   private monthlyData: any;
   private yearData: any;
   private dataRequests: number = 0;
 
-  private xColumnName:string = "Year";
+  public xColumnName:string = "Year";
 
   @Output()
   data: any;

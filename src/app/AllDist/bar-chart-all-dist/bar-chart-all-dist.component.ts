@@ -77,19 +77,19 @@ export class BarChartAllDistComponent implements OnInit {
   private fromDate: string;
   private toDate: string;
 
-  private year: number;
+  public year: number;
   private quarterData: any;
   private monthlyData: any;
   private annualData: any;
   private quarterChoosen: number = 1;
   private monthChoosen: number = 1;
   private months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  private monthName = "Jan";
+  public monthName = "Jan";
   private displayMonthData = false;
   private displayQuarterData = false;
   private granularChoosen: number = 1; // Granualirity : 1: Annual , 2 : Month , 3: Quarter
   private dataURL: any;
-  choosenValue: any;
+  public choosenValue: any;
   granular: number;
 
   private legendGroup_1:any;

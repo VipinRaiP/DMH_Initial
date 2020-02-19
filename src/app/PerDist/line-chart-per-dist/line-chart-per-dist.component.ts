@@ -38,10 +38,10 @@ export class LineChartPerDistComponent implements OnInit {
   private xColumnName: string = "ReportingMonthyear";
   private path: any;
   private line: d3.Line<[number, number]>; // this is line defination
-  private year: number;
-  private districtName: string;
+  public year: number;
+  public districtName: string;
   private districtId: number;
-  private noDataDisplay : boolean = true;
+  public noDataDisplay : boolean = true;
 
   constructor(private http: HttpClient, private lineChartService: LineChartPerDistService, private titleService: Title,
     private route: ActivatedRoute) { }

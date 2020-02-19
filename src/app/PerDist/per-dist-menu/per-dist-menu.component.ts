@@ -17,7 +17,7 @@ export class PerDistMenuComponent implements OnInit {
 
   private choosenDistrictId: number = 0;
   private distId = [];
-  private districtData:any;
+  public districtData:any;
 
   constructor(private router: Router, private linechartPerDistService: LineChartPerDistService,
     private route: ActivatedRoute, private areaChartPerDistService: AreaChartPerDistService,

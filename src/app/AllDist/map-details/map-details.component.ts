@@ -44,29 +44,29 @@ export const MY_FORMATS = {
   ]
 })
 export class MapDetailsComponent implements OnInit {
-  private year: number = new Date().getFullYear();
-  private quarterData: any;
-  private monthlyData: any;
-  private annualData: any;
-  private districtSelected : String;
-  private janData:string;
-  private febData:string;
-  private marData:string;
-  private aprData:string;
-  private mayData:string;
-  private juneData:string;
-  private julyData:string;
-  private augData:string;
-  private septData:string;
-  private octData:string;
-  private novData:string;
-  private decData:string;
+  public year: number = new Date().getFullYear();
+  public quarterData: any;
+  public monthlyData: any;
+  public annualData: any;
+  public districtSelected : String;
+  public janData:string;
+  public febData:string;
+  public marData:string;
+  public aprData:string;
+  public mayData:string;
+  public juneData:string;
+  public julyData:string;
+  public augData:string;
+  public septData:string;
+  public octData:string;
+  public novData:string;
+  public decData:string;
   
-  private quat1Data:string;
-  private quat2Data:string;
-  private quat3Data:string;
+  public quat1Data:string;
+  public quat2Data:string;
+  public quat3Data:string;
 
-  private yearData:string;
+  public yearData:string;
 
 
   constructor(private http:HttpClient,private mapService : MapService) { 
@@ -87,7 +87,7 @@ export class MapDetailsComponent implements OnInit {
     )
   }
 
-  private yearObj = new FormControl(moment());
+  public yearObj = new FormControl(moment());
 
   choosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<Moment>) {
     const ctrlValue = this.yearObj.value;
