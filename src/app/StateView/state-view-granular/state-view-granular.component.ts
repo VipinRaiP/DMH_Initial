@@ -44,7 +44,7 @@ export const MY_FORMATS = {
   ]
 })
 export class StateViewGranularComponent implements OnInit {
-  public minYear: number = 2017;
+  public minYear: number = 2018;
   public maxYear: number = new Date().getFullYear();
   private annualData: any;
   public quarterChoosen: number = 1;
@@ -206,7 +206,7 @@ export class StateViewGranularComponent implements OnInit {
       }
       return {
         yLabel: "Alcohol Cases",
-        threshold: 20000,
+        threshold: 40000,
         yColumnName: this.parameterName,
         parameterNumber: paramNumber
       }

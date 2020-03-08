@@ -5,6 +5,7 @@ import { MatSliderModule, MatNativeDateModule, MatInputModule, MatRadioModule, M
 import { BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {Ng5SliderModule} from 'ng5-slider';
 import {MatDatepickerModule,MatFormFieldModule} from '@angular/material';
+import { ChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 import { BarChartAllDistComponent } from './AllDist/bar-chart-all-dist/bar-chart-all-dist.component';
@@ -27,11 +28,15 @@ import { BarChartStateService } from './services/bar-chart-state.service';
 import { AreaChartPerDistComponent } from './PerDist/area-chart-per-dist/area-chart-per-dist.component';
 import { AreaChartPerDistService } from './services/areaChartPerDist.service';
 import { MainMapComponent } from './AllDist/main-map/main-map.component';
-import { MapDetailsComponent } from './AllDist/map-details/map-details.component';
+import { MapDetailsComponent, PerDistDataDialog } from './AllDist/map-details/map-details.component';
 import { MapService } from './AllDist/main-map/main-map.service';
 import { ExpenseComponent, DialogDataExampleDialog } from './expense/expense.component';
 import { ExpenseMenuComponent } from './expense/expense-menu/expense-menu.component';
-import {ExpenseService } from './expense/expense.service'
+import {ExpenseService } from './expense/expense.service';
+import { RadarChartComponent } from './RadarChart/radar-chart/radar-chart.component'
+
+
+
 
 
 @NgModule({
@@ -53,10 +58,13 @@ import {ExpenseService } from './expense/expense.service'
     MapDetailsComponent,
     ExpenseComponent,
     ExpenseMenuComponent,
-    DialogDataExampleDialog
+    DialogDataExampleDialog,
+    PerDistDataDialog,
+    RadarChartComponent
   ],
   entryComponents: [
-    DialogDataExampleDialog
+    DialogDataExampleDialog,
+    PerDistDataDialog
   ],
   imports: [
     BrowserModule,
@@ -74,7 +82,8 @@ import {ExpenseService } from './expense/expense.service'
     MatRadioModule,
     ModalModule,
     MatSlideToggleModule,
-    MatDialogModule
+    MatDialogModule,
+    ChartsModule
   ],
   providers: [BarChartAllDistService,
               LineChartPerDistService,

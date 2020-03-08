@@ -1,0 +1,11 @@
+<h3 style="text-align:center;">Radar Chart</h3>
+<div style="display: block;background-color: blanchedalmond;">
+  <!--canvas baseChart
+          [datasets]="demoradarChartData"
+          [labels]="demoradarChartLabels"
+          [chartType]="radarChartType"
+          (chartHover)="chartHovered($event)"
+          (chartClick)="chartClicked($event)"></canvas-->
+  <canvas *ngIf="DisplayRadarChart==true"  baseChart [datasets]="RadarChartData" [labels]="RadarChartLabels" [chartType]="radarChartType"
+    (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+</div>

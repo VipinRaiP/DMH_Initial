@@ -331,7 +331,6 @@ this.expenseService.onBarClicked.subscribe(
       .attr("cy", d => this.yScaleLine(d.total))
       .attr("r", 5)
       .attr("fill", "blue");
-
   }
 
 
