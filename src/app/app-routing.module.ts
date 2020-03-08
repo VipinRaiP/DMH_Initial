@@ -7,11 +7,13 @@ import { AllDistMenuComponent } from './AllDist/all-dist-menu/all-dist-menu.comp
 import { PerDistMenuComponent } from './PerDist/per-dist-menu/per-dist-menu.component';
 import { StateViewMenuComponent } from './StateView/state-view-menu/state-view-menu.component';
 import { BarChartStateComponent } from './StateView/bar-chart-state/bar-chart-state.component';
+import { RadarChartComponent } from './RadarChart/radar-chart/radar-chart.component';
 
 const appRoutes :Routes = [
     {path: 'barChartAllDist',component:BarChartAllDistComponent},
     {path: 'lineChartPerDist',component:LineChartPerDistComponent},
     {path:'',component:HomeComponentComponent},
+    {path:'radarChart',component:RadarChartComponent},
     {
         path:'allDist',
         component:AllDistMenuComponent,

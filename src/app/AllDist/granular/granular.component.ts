@@ -69,6 +69,7 @@ export class GranularComponent implements OnInit {
   private sortByChoosen=1;
 
   public xColumnName = "District";
+  private parameterNumber: any;
 
 
   constructor(private http: HttpClient, private barChartService: BarChartAllDistService, ) { }
@@ -238,6 +239,7 @@ export class GranularComponent implements OnInit {
       granular: this.granularChoosen,
       choosenValue: (this.granularChoosen == 1) ? this.year : (this.granularChoosen == 2) ? this.monthChoosen : this.quarterChoosen,
       data: this.data,
+      parameterNumber : this.parameterNumber
     }
     this.barChartService.updateChartData(sendingData);
   }
@@ -260,7 +262,7 @@ export class GranularComponent implements OnInit {
       }
       return {
         yLabel: "Alcohol Cases", 
-        threshold : 3000, 
+        threshold : 2000, 
         yColumnName : this.parameterName
       }  
     }
@@ -273,7 +275,7 @@ export class GranularComponent implements OnInit {
       }
       return {
         yLabel: "Suicide Cases",
-        threshold: 3000,
+        threshold: 2000,
         yColumnName: this.parameterName
       }
     }
@@ -287,6 +289,7 @@ export class GranularComponent implements OnInit {
   processDataRequest(newDataReq) {
     console.log("District granualar : Data req received")
     console.log(newDataReq)
+    this.parameterNumber  = newDataReq.parameterNumber;
     // Update chart parameters
     this.chartParameters = this.resolveChartParameter(newDataReq.parameterNumber);
     this.barChartService.updateParameters(this.chartParameters);

@@ -176,6 +176,8 @@ export class BarChartStateComponent implements OnInit {
     let xDomain = this.data.map(d => d[xValue]);
     let yDomain = [0, d3.max(this.data, d => d[yValue])];
 
+    console.log(this.data[0]);
+
     // create scales
     this.xScale = d3.scaleBand().domain(xDomain).rangeRound([0, this.width - this.axisShortOffset]).padding(0.3);
     this.yScale = d3.scaleLinear().domain(yDomain).range([this.height - this.axisShortOffset, 0]);
