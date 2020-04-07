@@ -8,6 +8,7 @@ import { PerDistMenuComponent } from './PerDist/per-dist-menu/per-dist-menu.comp
 import { StateViewMenuComponent } from './StateView/state-view-menu/state-view-menu.component';
 import { BarChartStateComponent } from './StateView/bar-chart-state/bar-chart-state.component';
 import { RadarChartComponent } from './RadarChart/radar-chart/radar-chart.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const appRoutes :Routes = [
     {path: 'barChartAllDist',component:BarChartAllDistComponent},
@@ -42,6 +43,10 @@ const appRoutes :Routes = [
     {
         path:'perDistView/:distId',
         component: PerDistMenuComponent
+    },
+    {
+        path:'dashboard',
+        component: DashboardComponent
     }
 ];
 

@@ -1,0 +1,26 @@
+<div class="container-fluid" style="padding-top:50px;padding-bottom:50px;padding-left: 50px">
+    <h2>Dashboard of the DMH</h2>
+    <div class="row">
+        <div class="col-sm-6 col-lg-3 mg-t-10 mg-sm-t-0">
+            <app-line-chart-card CardName="CMD Cases" total_cases="2100" data="{{AlcoholData}}"></app-line-chart-card>
+        </div>
+        <div class="col-sm-6 col-lg-3 mg-t-10 mg-sm-t-0">
+            <app-line-chart-card CardName="Alcohol Cases" total_cases="2222" data="{{AlcoholData}}"></app-line-chart-card>
+        </div>
+        <div class="col-sm-6 col-lg-3 mg-t-10 mg-sm-t-0">
+            <app-line-chart-card CardName="SMD Cases" total_cases="322" data="{{AlcoholData}}"></app-line-chart-card>
+        </div>
+        <div class="col-sm-6 col-lg-3 mg-t-10 mg-sm-t-0">
+            <app-line-chart-card CardName="Suicide Cases" total_cases="233" data="{{AlcoholData}}"></app-line-chart-card>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-9">
+            <app-stack-line-chart></app-stack-line-chart>
+        </div>
+        <div class="col-md-3">
+            <app-pie-chart *ngIf="pieChartLoad" [chartAreaId]="pieChartId[0]" [chartData]="AlcoholGenderWiseData"></app-pie-chart>        
+        </div>
+    </div>
+</div>

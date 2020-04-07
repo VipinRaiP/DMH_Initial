@@ -1,0 +1,24 @@
+.tooltip{
+    background-color: rgba(0,0,0,0.75);
+    padding: 5px;
+    border-radius: 2px;
+    font-family: sans-serif;
+    color: white;
+    pointer-events: none;
+    box-shadow: 0 0 5px #999999;
+}
+
+.tooltip-box{
+    width: 120px;
+    height: 20px;
+}
+
+#pie-chart-area{
+    width: 235px;
+    height: 450px;
+}
+
+#pie-chart-1{
+    color: magenta;
+}
+

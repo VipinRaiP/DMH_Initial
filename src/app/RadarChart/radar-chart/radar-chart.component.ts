@@ -71,5 +71,9 @@ export class RadarChartComponent implements OnInit {
     })
     this.DisplayRadarChart = true;
     console.log(this.RadarChartData);
-  }  
+  }
+  
+  
+
+  
 }

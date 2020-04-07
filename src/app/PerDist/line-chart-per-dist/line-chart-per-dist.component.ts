@@ -59,6 +59,7 @@ export class LineChartPerDistComponent implements OnInit {
     this.lineChartService.getChartDataListener().subscribe((newData) => {
       console.log("Line chart: new data received");
       this.data = newData.data;
+      console.log(this.data);
       this.districtId = newData.district;
       this.districtName = newData.districtName;
       this.year = newData.year;
@@ -138,7 +139,7 @@ export class LineChartPerDistComponent implements OnInit {
       .attr("y", 130)
       .text("Less than " + this.chartParameters.threshold)
       .style("font-size", "15px")
-      .attr("alignment-baseline", "middle");
+      .attr("alignment-baseline", "middle");python
 
     legendGroup
       .append("text")

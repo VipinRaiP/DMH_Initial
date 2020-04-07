@@ -33,11 +33,12 @@ import { MapService } from './AllDist/main-map/main-map.service';
 import { ExpenseComponent, DialogDataExampleDialog } from './expense/expense.component';
 import { ExpenseMenuComponent } from './expense/expense-menu/expense-menu.component';
 import {ExpenseService } from './expense/expense.service';
-import { RadarChartComponent } from './RadarChart/radar-chart/radar-chart.component'
-
-
-
-
+import { RadarChartComponent } from './RadarChart/radar-chart/radar-chart.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { PieChartComponent } from './dashboard/pie-chart/pie-chart.component'
+import { DoughnutChartComponent } from 'angular-d3-charts';
+import { StackLineChartComponent } from './dashboard/stack-line-chart/stack-line-chart.component';
+import { LineChartCardComponent } from './dashboard/line-chart-card/line-chart-card.component'
 
 @NgModule({
   declarations: [
@@ -60,7 +61,12 @@ import { RadarChartComponent } from './RadarChart/radar-chart/radar-chart.compon
     ExpenseMenuComponent,
     DialogDataExampleDialog,
     PerDistDataDialog,
-    RadarChartComponent
+    RadarChartComponent,
+    DashboardComponent,
+    PieChartComponent,
+    DoughnutChartComponent,
+    StackLineChartComponent,
+    LineChartCardComponent
   ],
   entryComponents: [
     DialogDataExampleDialog,
